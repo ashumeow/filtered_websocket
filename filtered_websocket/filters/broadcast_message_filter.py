@@ -1,7 +1,7 @@
 from base import WebSocketMessageFilter
 
 
-class TokenMessageFilter(WebSocketMessageFilter):
+class BroadcastMessageFilter(WebSocketMessageFilter):
 
     @classmethod
     def filter(cls, web_socket_instance, msg):

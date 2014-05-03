@@ -7,7 +7,7 @@ from base import WebSocketMessageFilter, WebSocketDisconnectFilter
 class TokenMessageFilter(WebSocketMessageFilter):
 
     @classmethod
-    def filterr(cls, web_socket_instance, msg):
+    def filter(cls, web_socket_instance, msg):
         token = re.search("token:([^\s]*)", msg)
         if token is not None:
             web_socket_instance.token = token.group(1)
@@ -26,7 +26,7 @@ class TokenMessageFilter(WebSocketMessageFilter):
 class TokenDisconnectFilter(WebSocketDisconnectFilter):
 
     @classmethod
-    def filterr(cls, web_socket_instance):
+    def filter(cls, web_socket_instance):
         if web_socket_instance.token:
             try:
                 web_socket_instance.storage_object[web_socket_instance.token].remove(web_socket_instance.id)
