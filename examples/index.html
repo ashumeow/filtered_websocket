@@ -1,0 +1,4 @@
+<script>
+socket = new WebSocket("ws://localhost:7777")
+socket.onmessage = function(e) { console.log(e.data);};
+</script>
