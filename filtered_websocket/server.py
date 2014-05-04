@@ -2,6 +2,9 @@
 
 """
 FilteredWebSocket: Morgan (Reece) Phillips @linuxpoetry linux-poetry.com
+
+Create WebSocket servers by composing filter chains.
+
 """
 
 from twisted.internet.protocol import Factory
