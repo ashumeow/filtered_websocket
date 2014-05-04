@@ -37,7 +37,7 @@ Filter chains are implemented like so:
     foo
     bar
 
-In filtered_websocket.server each server event has a corresponding filter chain, like the one shown above:
+In filtered_websocket.server each server event has a corresponding base filter class, like the class 'A' shown above:
 
     WebSocketDataFilter # Will run against any data received event
     WebSocketMessageFilter # Will run against any valid message frames
