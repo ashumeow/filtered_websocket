@@ -1,2 +1,3 @@
 twisted
 TwistedWebsocket
+redis_collections

@@ -5,33 +5,29 @@ from default_storage_object import BaseStorageObject
 
 
 def redis_subparser(parser):
-    sub_parsers = parser.add_subparsers()
-    redis_parser = sub_parsers.add_parser(
-        "redis",
-        help="Use redis to back the server's storage object."
-    )
-    redis_parser.add_argument(
+    parser.add_argument(
         "-redis_host",
         default="localhost"
     )
-    redis_parser.add_argument(
+    parser.add_argument(
         "-redis_port",
         type=int,
         default=6379
     )
-    redis_parser.add_argument(
+    parser.add_argument(
         "-redis_key",
         help="A key prefix.",
-        default="app_key"
+        default="my_app"
     )
+    return parser
 
 
 class RedisStorageObject(BaseStorageObject):
 
     def __init__(self, *args, **kwargs):
-        host = kwargs.get("host", "localhost")
-        port = kwargs.get("port", 6379)
-        key = kwargs.get("key", "my_app")
+        host = kwargs.get("host")
+        port = kwargs.get("port")
+        key = kwargs.get("key")
         self.storage = redis_collections.Dict(key=key, redis=redis.Redis(host=host, port=port))
 
     def __getitem__(self, item):

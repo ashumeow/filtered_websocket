@@ -26,7 +26,7 @@ class TokenMessageFilter(WebSocketMessageFilter):
 class TokenDisconnectFilter(WebSocketDisconnectFilter):
 
     @classmethod
-    def filter(cls, web_socket_instance):
+    def filter(cls, web_socket_instance, data):
         if web_socket_instance.token:
             try:
                 web_socket_instance.storage_object.remove(web_socket_instance.token, web_socket_instance.id)
