@@ -1,7 +1,12 @@
 Filtered WebSocket
 ===================
 
-Most websocket server implementations rely on inheritance for extending functionality, which is usually fine, but after implementing several servers myself I decided that there was (for my use cases) a more DRY way to go about it.  Filtered WebSocket is the result; a straight forward framework for implementing websocket servers via filter chains.  Using this method filters are like building blocks, with each one adding some new behavior to an existing server instance.  Building complex behaviors is as easy as importing new modules, which automatically add themselves to the filter chain associated with some server event.
+Most websocket server implementations rely on inheritance for extending functionality, which is usually fine, but after implementing several servers myself I decided that there was (for my use cases) a more DRY way to go about it.  
+
+Filtered WebSocket is a straight forward framework for implementing websocket servers where server behaviors are encapsulated within filters.  Building complex behaviors is as easy as importing new modules, which automatically add themselves to the filter chain associated with some server event.
+
+The end result is that building a server becomes like building a process pipeline.  I imagine it as:
+    cat server_event | server_behavior_a | server_behavior_b | etc....
 
 
 *features:*
