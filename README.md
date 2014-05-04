@@ -36,8 +36,7 @@ To create a new filter simply inherit from one of the base filter classes:
     build_reactor(parser.parse_args(sys.argv[1:]))
     reactor.run()
 
-
-
+*chat_server.py output*
 
     ./chat_server.py --help
     usage: chat_server.py [-h] [-p PORT] [-key KEY] [-cert CERT] [-token TOKEN]
