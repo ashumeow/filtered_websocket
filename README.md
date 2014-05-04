@@ -26,7 +26,7 @@ To create a new filter simply inherit from one of the base filter classes:
     WebSocketMessageFilter # Will run against any valid message frames
     WebSocketDisconnectFilter # Will run anytime a client disconnects
     
-*example: a broadcast server*
+*example: chat_server.py*
 
     from filtered_websocket.server import * 
     from filtered_websocket.filters import broadcast_message_filter 
@@ -35,3 +35,14 @@ To create a new filter simply inherit from one of the base filter classes:
     parser = default_parser()
     build_reactor(parser.parse_args(sys.argv[1:]))
     reactor.run()
+
+
+    ./chat_server.py --help
+    usage: chat_server.py [-h] [-p PORT] [-key KEY] [-cert CERT] [-token TOKEN]
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -p PORT, --port PORT  The listening port.
+      -key KEY              A key file (ssl).
+      -cert CERT            A certificate file (ssl).
+      -token TOKEN          Set a default token.
