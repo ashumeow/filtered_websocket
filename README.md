@@ -7,6 +7,7 @@ A straight forward framework for implementing websocket servers via filter chain
 
 - Supports SSL
 - Supports Redis for backend session storage
+- Scales horizontally via remote backend storage
 - Supports token based auth
 
 
