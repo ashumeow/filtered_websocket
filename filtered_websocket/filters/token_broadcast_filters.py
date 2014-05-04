@@ -12,7 +12,7 @@ class TokenMessageFilter(WebSocketMessageFilter):
         if token is not None:
             web_socket_instance.token = token.group(1)
             logging.debug("Registering %s with broadcast group: %s" % (web_socket_instance.id, token.group(1)))
-            web_socket_instance.storage_object[web_socket_instance.token].add(web_socket_instance.id)
+            web_socket_instance.storage_object.add(web_socket_instance.token, web_socket_instance.id)
             web_socket_instance.sendMessage("Successfully registered with broadcast group: %s" % web_socket_instance.token)
         elif web_socket_instance.token is not None:
             for _id, user in web_socket_instance.users.items():
@@ -29,6 +29,6 @@ class TokenDisconnectFilter(WebSocketDisconnectFilter):
     def filter(cls, web_socket_instance):
         if web_socket_instance.token:
             try:
-                web_socket_instance.storage_object[web_socket_instance.token].remove(web_socket_instance.id)
+                web_socket_instance.storage_object.remove(web_socket_instance.token, web_socket_instance.id)
             except Exception as e:
                 logging.error(e.message)

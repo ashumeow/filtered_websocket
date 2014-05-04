@@ -5,23 +5,23 @@ will have its filter method called upon run being executed from its parent class
 
 Ex:
 
-class A(FilterBase):
-    class __metaclass__(FilterMeta):
-        pass
+>>> class A(FilterBase):
+>>>     class __metaclass__(FilterMeta):
+>>>         pass
 
-Class B(A):
-    @classmethod
-    def filter(cls, web_socket_instance):
-        print("foo")
+>>> Class B(A):
+>>>     @classmethod
+>>>     def filter(cls, web_socket_instance):
+>>>        print("foo")
 
-Class C(A):
-    @classmethod
-    def filter(cls, web_socket_instance):
-        print("bar")
+>>> Class C(A):
+>>>     @classmethod
+>>>     def filter(cls, web_socket_instance):
+>>>         print("bar")
 
 >>> A.run(web_socket_instance)
->>> foo
->>> bar
+foo
+bar
 
 """
 

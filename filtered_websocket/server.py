@@ -7,11 +7,11 @@ FilteredWebSocket: Morgan (Reece) Phillips @linuxpoetry linux-poetry.com
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from TwistedWebsocket.server import Protocol
-import collections
 import argparse
 import ssl
 import sys
 
+from storage_objects.default_storage_object import DefaultStorageObject
 from filters.base import (
     WebSocketDataFilter,
     WebSocketMessageFilter,
@@ -49,7 +49,7 @@ class FilteredWebSocket(Protocol):
 class FilteredWebSocketFactory(Factory):
 
     def __init__(self, **kwargs):
-        self.storage_object = kwargs.get("storage_object", collections.defaultdict(set))
+        self.storage_object = kwargs.get("storage_object", DefaultStorageObject())
         self.token = kwargs.get("token")
         self.users = {}
 
