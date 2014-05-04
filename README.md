@@ -1,11 +1,11 @@
 Filtered WebSocket
 ===================
 
-Filtered WebSocket is a straight forward framework for implementing websocket servers where server behaviors are encapsulated within filters.  Building complex behaviors becomes as easy as importing new modules, which automatically add themselves to the filter chain associated with some server event.
+Filtered WebSocket is a straight forward framework for implementing websocket servers which draws inspiration from UNIX process pipelines.  It's a metaphor for:
 
-The inspiration comes from UNIX process pipelines since the filter chains are a good metaphor for:
- 
-    cat server_event | server_behavior_a | server_behavior_b | etc....
+    cat server_event | behavior_a | behavior_b | ...
+
+Server behaviors are encapsulated within filters, and uilding complex behaviors becomes as easy as importing new modules -- imported filters automatically add themselves to an appropriate filter chain (pipeline) associated with some server event.
 
 
 *features:*
