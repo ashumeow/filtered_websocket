@@ -6,16 +6,26 @@ def read(fname):
 
 setup(
     name = "filtered_websocket",
-    version = "0.0.0",
+    version = "0.0.1",
     author = "Morgan Reece Phillips",
     author_email = "winter2718@gmail.com",
     description = ("A simple framework for constructing websocket servers"
                                    "from filter chains."),
+    install_requires=[
+        "twisted",
+        "redis",
+        "redis_collections",
+        "TwistedWebsocket",
+    ],
     license = "BSD",
     keywords = "websocket TwistedWebsocket",
-    url = "http://packages.python.org/an_example_pypi_project",
-    packages=['filtered_websocket',],
-    long_description=read('README.md'),
+    url = "https://github.com/mrrrgn/filtered_websocket",
+    packages=[
+        "filtered_websocket",
+        "filtered_websocket.filters",
+        "filtered_websocket.storage_objects",
+    ],
+    long_description=read("README.md"),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
