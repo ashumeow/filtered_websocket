@@ -1,3 +1,4 @@
+setup.cfg
 setup.py
 filtered_websocket/__init__.py
 filtered_websocket/server.py
