@@ -5,7 +5,7 @@ Filtered WebSocket is a straight forward framework for implementing websocket se
 
     cat server_event | behavior_a | behavior_b | ...
 
-Server event handlers are encapsulated within filters such that building elaborate behaviors is as easy as importing new modules.  Imported filters automatically add themselves to an appropriate filter chain (pipeline) associated with some server event.
+Server event handlers are encapsulated within filters such that building elaborate behaviors is as easy as importing new modules.  Imported filters automatically add themselves to an appropriate filter chain (pipeline).
 
 
 *features:*
