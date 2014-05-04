@@ -19,7 +19,10 @@ New behaviors are added by simply importing filter modules.
     
     from filtered_websocket.filters import stdout_rawdata # Adds logging to a server
     from filtered_websocket.filters import broadcast_message_filter # Broadcasts messages to all connected clients
-    
+
+###### Install 
+    pip install filtered_websocket
+   
 ###### Create New Filters
 
 Filter chains are implemented like so:
