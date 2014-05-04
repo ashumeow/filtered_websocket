@@ -22,6 +22,9 @@ New behaviors are added by simply importing filter modules.
 
 ###### Install 
     pip install filtered_websocket
+
+###### Run Default Server :: requires redis instance
+    python -m filtered_websocket.server -h
    
 ###### Create New Filters
 

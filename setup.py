@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "filtered_websocket",
-    version = "0.0.2",
+    version = "0.0.3",
     author = "Morgan Reece Phillips",
     author_email = "winter2718@gmail.com",
     description = ("A simple framework for constructing websocket servers"
@@ -15,11 +15,10 @@ setup(
         "twisted",
         "redis",
         "redis_collections",
-        "TwistedWebsocket",
     ],
     license = "BSD",
     keywords = "websocket TwistedWebsocket",
-    url = "https://github.com/mrrrgn/filtered_websocket/tarball/0.0.2",
+    url = "https://github.com/mrrrgn/filtered_websocket/tarball/0.0.3",
     packages=[
         "filtered_websocket",
         "filtered_websocket.filters",

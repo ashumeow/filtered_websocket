@@ -1,4 +1,3 @@
 twisted
-TwistedWebsocket
 redis
 redis_collections

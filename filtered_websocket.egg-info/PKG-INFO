@@ -1,8 +1,8 @@
 Metadata-Version: 1.1
 Name: filtered-websocket
-Version: 0.0.2
+Version: 0.0.3
 Summary: A simple framework for constructing websocket servers from filter chains.
-Home-page: https://github.com/mrrrgn/filtered_websocket/tarball/0.0.2
+Home-page: https://github.com/mrrrgn/filtered_websocket/tarball/0.0.3
 Author: Morgan Reece Phillips
 Author-email: winter2718@gmail.com
 License: BSD
