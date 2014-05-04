@@ -10,7 +10,7 @@ setup(
     author = "Morgan Reece Phillips",
     author_email = "winter2718@gmail.com",
     description = ("A simple framework for constructing websocket servers"
-                                   "from filter chains."),
+                                   " from filter chains."),
     install_requires=[
         "twisted",
         "redis",
@@ -19,7 +19,7 @@ setup(
     ],
     license = "BSD",
     keywords = "websocket TwistedWebsocket",
-    url = "https://github.com/mrrrgn/filtered_websocket",
+    url = "https://github.com/mrrrgn/filtered_websocket/tarball/0.0.1",
     packages=[
         "filtered_websocket",
         "filtered_websocket.filters",
