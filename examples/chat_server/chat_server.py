@@ -8,8 +8,9 @@ import sys
 sys.path.append("../../")
 
 from filtered_websocket.server import * # NOQA
-from filtered_websocket.filters import broadcast_message_filter # NOQA
+from filtered_websocket.filters import broadcast_message_filter, stdout_messages # NOQA
 
+# NOQA
 
 parser = default_parser()
 build_reactor(parser.parse_args(sys.argv[1:]))

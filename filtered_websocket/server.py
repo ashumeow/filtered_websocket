@@ -26,9 +26,8 @@ class FilteredWebSocket(Protocol):
 
     def __init__(self, *args, **kwargs):
 
-        # The storage object can be backed by a local data structure or a
-        # remote storage device.  However, it must always behave like a
-        # defaultdict(set)
+        # The storage object should inherit from
+        # storage_objects.default_storage_object.BaseStorageObject
         self.storage_object = kwargs.pop("storage_object")
 
         # The token object may be leveraged for authentication via OAuth,
@@ -109,13 +108,15 @@ if __name__ == '__main__':
     parser = redis_subparser(parser)
     options = parser.parse_args(sys.argv[1:])
 
-    extra = {
-        "storage_object": RedisStorageObject(
-            host=options.redis_host,
-            port=options.redis_port,
-            key=options.redis_key
-        )
-    }
+    extra = {}
+    if options.redis is True:
+        extra = {
+            "storage_object": RedisStorageObject(
+                host=options.redis_host,
+                port=options.redis_port,
+                key=options.redis_key
+            )
+        }
 
     build_reactor(options, **extra)
     reactor.run()

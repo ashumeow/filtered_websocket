@@ -6,6 +6,11 @@ from default_storage_object import BaseStorageObject
 
 def redis_subparser(parser):
     parser.add_argument(
+        "-redis",
+        help="Use redis as a storage object.",
+        action="store_true"
+    )
+    parser.add_argument(
         "-redis_host",
         default="localhost"
     )
