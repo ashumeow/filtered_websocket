@@ -7,6 +7,10 @@ filtered_websocket.egg-info/SOURCES.txt
 filtered_websocket.egg-info/dependency_links.txt
 filtered_websocket.egg-info/requires.txt
 filtered_websocket.egg-info/top_level.txt
+filtered_websocket/TwistedWebsocket/__init__.py
+filtered_websocket/TwistedWebsocket/exception.py
+filtered_websocket/TwistedWebsocket/frame.py
+filtered_websocket/TwistedWebsocket/server.py
 filtered_websocket/filters/__init__.py
 filtered_websocket/filters/base.py
 filtered_websocket/filters/broadcast_message_filter.py
