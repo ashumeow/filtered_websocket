@@ -4,23 +4,23 @@ import redis_collections
 from default_storage_object import BaseStorageObject
 
 
-def redis_subparser(parser):
+def redis_parser(parser):
     parser.add_argument(
-        "-redis",
+        "--redis",
         help="Use redis as a storage object.",
         action="store_true"
     )
     parser.add_argument(
-        "-redis_host",
+        "--redis_host",
         default="localhost"
     )
     parser.add_argument(
-        "-redis_port",
+        "--redis_port",
         type=int,
         default=6379
     )
     parser.add_argument(
-        "-redis_key",
+        "--redis_key",
         help="A key prefix.",
         default="my_app"
     )
@@ -33,7 +33,8 @@ class RedisStorageObject(BaseStorageObject):
         host = kwargs.get("host")
         port = kwargs.get("port")
         key = kwargs.get("key")
-        self.storage = redis_collections.Dict(key=key, redis=redis.Redis(host=host, port=port))
+        self._redis = redis.Redis(host=host, port=port)
+        self.storage = redis_collections.Dict(key=key, redis=self._redis)
 
     def __getitem__(self, item):
         return self.storage.get(item)

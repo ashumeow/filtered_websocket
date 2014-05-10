@@ -11,6 +11,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from TwistedWebsocket.server import Protocol
 import argparse
+import json
 import ssl
 import sys
 
@@ -73,6 +74,17 @@ def default_parser():
         default=9000
     )
     parser.add_argument(
+        "-c",
+        "--config",
+        help="A JSON config file."
+    )
+    parser.add_argument(
+        "-f",
+        "--filters",
+        help="Filters to import at runtime.",
+        nargs="*"
+    )
+    parser.add_argument(
         "-key",
         help="A key file (ssl)."
     )
@@ -82,7 +94,7 @@ def default_parser():
     )
     parser.add_argument(
         "-token",
-        help="Set a default token."
+        help="Set a default token value."
     )
     return parser
 
@@ -100,14 +112,61 @@ def build_reactor(options, **kwargs):
         )
 
 
+def config_deserializer(filename):
+    """
+    Transforms a JSON config file into a list or arguments which may be passed
+    to arg_parser.parse_args.
+
+    For instance:
+
+        {
+            port: 22
+        }
+
+    Would would be transformed to:
+
+        ['--port', '22']
+    """
+    with open(filename, "r") as config_file:
+        config_lines = "".join([l for l in config_file if l[0] != "#"])
+        config_data = json.loads(config_lines)
+        processed_config_data = []
+        for key, value in config_data.items():
+            if key == "flags":
+                for flag in value:
+                    processed_config_data.append("--%s" % flag)
+            else:
+                processed_config_data.append("--%s" % key)
+                if isinstance(value, (list, set)):
+                    processed_config_data += value
+                else:
+                    processed_config_data.append(value)
+    return processed_config_data
+
+
 if __name__ == '__main__':
-    from filters import token_broadcast_filters # NOQA
-    from storage_objects.redis_storage_object import RedisStorageObject, redis_subparser
+    import importlib
+    from storage_objects.redis_storage_object import RedisStorageObject, redis_parser
 
     parser = default_parser()
-    parser = redis_subparser(parser)
+    parser = redis_parser(parser)
     options = parser.parse_args(sys.argv[1:])
 
+    # A passed in config file will overwrite all other args
+    if options.config is not None:
+        options = parser.parse_args(config_deserializer(options.config))
+
+    # If no filters are specified this will be imported.
+    # the broadcast_by_message filter just creates a simple broadcast server
+    FILTERS = ["filters.token_broadcast_filters", "filters.stdout_messages"]
+    if options.filters is not None:
+        FILTERS = options.filters
+
+    # Importing the filters will inject them into event handlers at runtime
+    for _filter in FILTERS:
+        importlib.import_module(_filter)
+
+    # Extra args to set up custom storage (redis in this case)
     extra = {}
     if options.redis is True:
         extra = {
