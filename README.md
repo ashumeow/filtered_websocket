@@ -33,12 +33,15 @@ New behaviors are added by simply importing filter modules.
 
 ###### Define a unique server via a json config file
 - config.json:
+
     {
         "port": "9000",
         "flags": ["redis"],
         "filters": ["filters.broadcast_messages_by_token", "filters.stdout_messages"]
     }
+
 - Passing it in creates a broadcast by token server with backed by redis which prints all messages to stdout
+
     python -m filtered_websocket.server -c config.json
 
 ###### Create New Filters
