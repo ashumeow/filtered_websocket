@@ -18,7 +18,7 @@ Server event handlers are encapsulated within filters such that building elabora
 New behaviors are added by simply importing filter modules.
     
     from filtered_websocket.filters import stdout_rawdata # Adds logging to a server
-    from filtered_websocket.filters import broadcast_message_filter # Broadcasts messages to all connected clients
+    from filtered_websocket.filters import broadcast_messages # Broadcasts messages to all connected clients
 
 ###### Install 
     pip install filtered_websocket
@@ -26,6 +26,21 @@ New behaviors are added by simply importing filter modules.
 ###### Run Default Server
     python -m filtered_websocket.server -h
    
+###### Build a unique server from the CLI using filters as arguments
+    # The server below will broadcast messages to all connected clients and print all
+    # data passing through it to stdout. 
+    python -m filtered_websocket.server -f "filters.broadcast_messages" "filters.stdout_rawdata"
+
+###### Define a unique server via a json config file
+- config.json:
+    {
+        "port": "9000",
+        "flags": ["redis"],
+        "filters": ["filters.broadcast_messages_by_token", "filters.stdout_messages"]
+    }
+- Passing it in creates a broadcast by token server with backed by redis which prints all messages to stdout
+    python -m filtered_websocket.server -c config.json
+
 ###### Create New Filters
 
 Filter chains are implemented like so:
@@ -74,7 +89,7 @@ To create a new filter simply inherit from one of the base filter classes.
 *example: chat_server.py*
 
     from filtered_websocket.server import * 
-    from filtered_websocket.filters import broadcast_message_filter 
+    from filtered_websocket.filters import broadcast_messages 
 
 
     parser = default_parser()
