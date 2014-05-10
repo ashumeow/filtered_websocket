@@ -40,7 +40,6 @@ New behaviors are added by simply importing filter modules.
     }
 
     # Passing it in creates a broadcast by token server with backed by redis which prints all messages to stdout
-
     python -m filtered_websocket.server -c config.json
 
 ###### Create New Filters
