@@ -33,7 +33,7 @@ class FilteredWebSocket(Protocol):
 
         # The token object may be leveraged for authentication via OAuth,
         # session keys, or other such methods.  See the
-        # token_broadcast_filters module for an example.
+        # broadcast_messages_by_token module for an example.
         self.token = kwargs.pop("token")
 
         super(FilteredWebSocket, self).__init__(*args, **kwargs)
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     # If no filters are specified this will be imported.
     # the broadcast_by_message filter just creates a simple broadcast server
-    FILTERS = ["filters.token_broadcast_filters", "filters.stdout_messages"]
+    FILTERS = ["filters.broadcast_messages_by_token", "filters.stdout_messages"]
     if options.filters is not None:
         FILTERS = options.filters
 
