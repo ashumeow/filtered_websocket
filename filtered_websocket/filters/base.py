@@ -9,14 +9,14 @@ Ex:
 >>>     class __metaclass__(FilterMeta):
 >>>         pass
 
->>> Class B(A):
+>>> class B(A):
 >>>     @classmethod
->>>     def filter(cls, web_socket_instance):
+>>>     def filter(cls, web_socket_instance, data):
 >>>        print("foo")
 
->>> Class C(A):
+>>> class C(A):
 >>>     @classmethod
->>>     def filter(cls, web_socket_instance):
+>>>     def filter(cls, web_socket_instance, data):
 >>>         print("bar")
 
 >>> A.run(web_socket_instance)
