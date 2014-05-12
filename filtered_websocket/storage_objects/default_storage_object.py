@@ -13,6 +13,17 @@ class BaseStorageObject(object):
     def remove(self, key, value):
         raise NotImplementedError
 
+
+class BasePubSubStorageObject(BaseStorageObject):
+    """
+    Defines standard interfaces for storage objects, like redis,
+    which support pubsub.
+    """
+
+    def publish(self, channel, data):
+        raise NotImplementedError
+
+
 class DefaultStorageObject(BaseStorageObject):
 
     def __init__(self, *args, **kwargs):

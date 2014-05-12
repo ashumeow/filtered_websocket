@@ -152,10 +152,10 @@ if __name__ == "__main__":
         print "\n[FRAME] from %s to %s:\n%s" % (self.id, _id, msg)
 
   class WebSocketFactory(Factory):
-    
+
     def __init__(self):
       self.users = {}
-    
+
     def buildProtocol(self, addr):
       return WebSocketHandler(self.users)
 
@@ -168,8 +168,8 @@ if __name__ == "__main__":
   parser.add_argument("-key", help="Path to your *.key file")
   parser.add_argument("-cert", help="Path to yout *.crt file")
   parser.add_argument("-v","--version", help="Show the package version and exit", action="store_true")
-  options = parser.parse_args(sys.argv[1:]) 
-  
+  options = parser.parse_args(sys.argv[1:])
+
   if options.version:
     print __VERSION__
     exit(0)
@@ -180,7 +180,7 @@ if __name__ == "__main__":
   else:
     if not options.key or not options.cert:
       parser.print_help()
-      exit(-1) 
+      exit(-1)
     with open(options.key) as keyFile:
       with open(options.cert) as certFile:
         cert = ssl.PrivateCertificate.loadPEM(keyFile.read() + certFile.read())

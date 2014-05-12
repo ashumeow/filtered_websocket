@@ -63,3 +63,11 @@ class WebSocketDisconnectFilter(FilterBase):
 
     class __metaclass__(FilterMeta):
         pass
+
+
+class StorageObjectPubSubFilter(FilterBase):
+    """
+    Chain called on events published by a back end storage object.
+    """
+    class __metaclass__(FilterMeta):
+        pass

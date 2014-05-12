@@ -100,16 +100,18 @@ def default_parser():
 
 
 def build_reactor(options, **kwargs):
+    web_socket_instance = FilteredWebSocketFactory(**kwargs)
     if options.key and options.cert:
         with open(options.key) as keyFile:
             with open(options.cert) as certFile:
                 cert = ssl.PrivateCertificate.loadPEM(keyFile.read() + certFile.read())
-                reactor.listenSSL(options.port, FilteredWebSocketFactory(**kwargs), cert.options())
+                reactor.listenSSL(options.port, web_socket_instance, cert.options())
     else:
         reactor.listenTCP(
             options.port,
-            FilteredWebSocketFactory(**kwargs)
+            web_socket_instance
         )
+    return web_socket_instance
 
 
 def config_deserializer(filename):
@@ -146,7 +148,11 @@ def config_deserializer(filename):
 
 if __name__ == '__main__':
     import importlib
-    from storage_objects.redis_storage_object import RedisStorageObject, redis_parser
+    from storage_objects.redis_storage_object import (
+        RedisStorageObject,
+        RedisPubSubListener,
+        redis_parser,
+    )
 
     parser = default_parser()
     parser = redis_parser(parser)
@@ -166,16 +172,37 @@ if __name__ == '__main__':
     for _filter in FILTERS:
         importlib.import_module(_filter)
 
+    # TODO: abstract the process of setting up custom storage/pubsub
     # Extra args to set up custom storage (redis in this case)
     extra = {}
     if options.redis is True:
-        extra = {
-            "storage_object": RedisStorageObject(
+            redis_storage_object = RedisStorageObject(
                 host=options.redis_host,
                 port=options.redis_port,
                 key=options.redis_key
             )
-        }
+            # Build our server protocol.
+            web_socket_instance = build_reactor(
+                options,
+                storage_object=redis_storage_object
+            )
+            # Setup our pubsub listener now that we have
+            # access to the web_socket_instance.
+            redis_pubsub = RedisPubSubListener(
+                redis_storage_object.redis,
+                options.redis_channels
+            )
+            reactor.callInThread(
+                redis_pubsub.listen,
+                web_socket_instance,
+            )
+            # Kill the listener on shutdown
+            reactor.addSystemEventTrigger(
+                "before",
+                "shutdown",
+                redis_pubsub.kill
+            )
 
-    build_reactor(options, **extra)
+    else:
+        build_reactor(options)
     reactor.run()
