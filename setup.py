@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "filtered_websocket",
-    version = "0.0.5",
+    version = "0.1.0",
     author = "Morgan Reece Phillips",
     author_email = "winter2718@gmail.com",
     description = ("A simple framework for constructing websocket servers"
@@ -18,11 +18,12 @@ setup(
     ],
     license = "BSD",
     keywords = "websocket TwistedWebsocket",
-    url = "https://github.com/mrrrgn/filtered_websocket/tarball/0.0.5",
+    url = "https://github.com/mrrrgn/filtered_websocket/tarball/0.1.0",
     packages=[
         "filtered_websocket",
         "filtered_websocket.filters",
         "filtered_websocket.storage_objects",
+        "filtered_websocket.pubsub_listeners",
         "filtered_websocket.TwistedWebsocket",
     ],
     long_description="""
@@ -32,7 +33,8 @@ setup(
     Imported filters automatically add themselves to an appropriate filter chain (pipeline).
 
     - Supports SSL
-    - Scales horizontally via remote backend storage (redis)
+    - Scales horizontally via remote backend storage (redis) and pubsub
+      handling
     - Supports token based auth
     - New behaviors are added by simply importing filter modules""",
     classifiers=[
