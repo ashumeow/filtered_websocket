@@ -146,7 +146,7 @@ def build_reactor(options, **kwargs):
         consumer,
         web_socket_instance
     )
-    consumer_loop.start(0.1, now=False)
+    consumer_loop.start(0.01, now=False)
     return web_socket_instance
 
 
