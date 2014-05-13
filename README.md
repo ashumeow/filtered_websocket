@@ -11,7 +11,7 @@ Server event handlers are encapsulated within filters such that building elabora
 *features:*
 
 - Supports SSL
-- Scales horizontally via remote backend storage (redis)
+- Scales horizontally via remote backend storage (redis) and pubsub
 - Supports token based auth
 
 
@@ -69,6 +69,7 @@ In filtered_websocket.server each server event has a corresponding base filter c
     WebSocketDataFilter # Will run against any data received event
     WebSocketMessageFilter # Will run against any valid message frames
     WebSocketDisconnectFilter # Will run anytime a client disconnects
+    WebSocketConsumerFilter # Will run against any data placed into a web socket instance's queue
 
 To create a new filter simply inherit from one of the base filter classes.
 
@@ -121,3 +122,20 @@ Redis back end support allows shared storage with other applications.
     }
     build_reactor(options, **extra)
 
+The redis pubsub_listener places all redis pubsub events in a queue where it may be handled by WebSocketConsumerFilter filters.
+    redis_storage_object = RedisStorageObject(
+        host=options.redis_host,
+        port=options.redis_port,
+        key=options.redis_key
+    )
+    redis_pubsub = RedisPubSubListener(
+        redis_storage_object.redis,
+        options.redis_channels
+    )
+    # Build our server reactor.
+    web_socket_instance = build_reactor(
+        options,
+        storage_object=redis_storage_object,
+        pubsub_listener=redis_pubsub
+    )
+     

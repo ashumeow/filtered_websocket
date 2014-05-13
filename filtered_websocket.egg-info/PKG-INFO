@@ -1,8 +1,8 @@
 Metadata-Version: 1.1
 Name: filtered-websocket
-Version: 0.0.5
+Version: 0.1.0
 Summary: A simple framework for constructing websocket servers from filter chains.
-Home-page: https://github.com/mrrrgn/filtered_websocket/tarball/0.0.5
+Home-page: https://github.com/mrrrgn/filtered_websocket/tarball/0.1.0
 Author: Morgan Reece Phillips
 Author-email: winter2718@gmail.com
 License: BSD
@@ -13,7 +13,8 @@ Description:
             Imported filters automatically add themselves to an appropriate filter chain (pipeline).
         
             - Supports SSL
-            - Scales horizontally via remote backend storage (redis)
+            - Scales horizontally via remote backend storage (redis) and pubsub
+              handling
             - Supports token based auth
             - New behaviors are added by simply importing filter modules
 Keywords: websocket TwistedWebsocket
