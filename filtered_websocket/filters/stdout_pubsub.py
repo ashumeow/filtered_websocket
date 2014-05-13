@@ -1,8 +1,8 @@
 import sys
-from base import StorageObjectPubSubFilter
+from base import WebSocketConsumerFilter
 
 
-class BroadcastMessageFilter(StorageObjectPubSubFilter):
+class BroadcastMessageFilter(WebSocketConsumerFilter):
 
     @classmethod
     def filter(cls, web_socket_instance, data):

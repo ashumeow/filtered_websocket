@@ -1,7 +1,7 @@
-from base import StorageObjectPubSubFilter
+from base import WebSocketConsumerFilter
 
 
-class BroadcastMessageFilter(StorageObjectPubSubFilter):
+class BroadcastMessageFilter(WebSocketConsumerFilter):
     """
     Will broadcast all pubsub events to connected websocket clients.
     """

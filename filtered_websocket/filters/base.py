@@ -65,9 +65,9 @@ class WebSocketDisconnectFilter(FilterBase):
         pass
 
 
-class StorageObjectPubSubFilter(FilterBase):
+class WebSocketConsumerFilter(FilterBase):
     """
-    Chain called on events published by a back end storage object.
+    Chain called on any data existing in web_socket_instance.queue.
     """
     class __metaclass__(FilterMeta):
         pass

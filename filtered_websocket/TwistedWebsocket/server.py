@@ -30,7 +30,9 @@ Sec-WebSocket-Accept: %s\r\n\r\n\
 
 class Protocol(BaseProtocol, object):
 
-  def __init__(self, users={}):
+  def __init__(self, users=None):
+    if users is None:
+      users = {}
     self.bufferIn = ""
     self.bufferOut = ""
     self.users = users

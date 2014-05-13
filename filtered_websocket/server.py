@@ -9,6 +9,7 @@ Create WebSocket servers by composing filter chains.
 
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
 from TwistedWebsocket.server import Protocol
 import argparse
 import json
@@ -20,6 +21,7 @@ from filters.base import (
     WebSocketDataFilter,
     WebSocketMessageFilter,
     WebSocketDisconnectFilter,
+    WebSocketConsumerFilter,
 )
 
 
@@ -35,6 +37,10 @@ class FilteredWebSocket(Protocol):
         # session keys, or other such methods.  See the
         # broadcast_messages_by_token module for an example.
         self.token = kwargs.pop("token")
+
+        # A queue to be used in any producer/consumer activities
+        # TODO: Implement this as an actual Queue object
+        self.queue = []
 
         super(FilteredWebSocket, self).__init__(*args, **kwargs)
 
@@ -55,6 +61,7 @@ class FilteredWebSocketFactory(Factory):
         self.storage_object = kwargs.get("storage_object", DefaultStorageObject())
         self.token = kwargs.get("token")
         self.users = {}
+        self.queue = []
 
     def buildProtocol(self, _address):
         return FilteredWebSocket(
@@ -99,9 +106,20 @@ def default_parser():
     return parser
 
 
+def consumer(web_socket_instance):
+    """
+    Called in a reactor loop to enable the producer/consumer pattern.
+    """
+    queue = web_socket_instance.queue
+    if len(queue) > 0:
+        data = queue.pop()
+        WebSocketConsumerFilter.run(web_socket_instance, data)
+
+
 def build_reactor(options, **kwargs):
     web_socket_instance = FilteredWebSocketFactory(**kwargs)
     pubsub_listener = kwargs.pop("pubsub_listener", None)
+
     if options.key and options.cert:
         with open(options.key) as keyFile:
             with open(options.cert) as certFile:
@@ -114,15 +132,21 @@ def build_reactor(options, **kwargs):
         )
     if pubsub_listener is not None:
         reactor.callInThread(
-            pubsub_listener.listen,
-            web_socket_instance,
+            pubsub_listener.listener,
+            web_socket_instance
         )
-        # Kill the listener on shutdown
         reactor.addSystemEventTrigger(
             "before",
             "shutdown",
             pubsub_listener.kill
         )
+
+    # Start the consumer loop
+    consumer_loop = LoopingCall(
+        consumer,
+        web_socket_instance
+    )
+    consumer_loop.start(0.1, now=False)
     return web_socket_instance
 
 
@@ -181,7 +205,6 @@ if __name__ == '__main__':
     for _filter in FILTERS:
         importlib.import_module(_filter)
 
-    # TODO: abstract the process of setting up custom storage/pubsub
     # Extra args to set up custom storage (redis in this case)
     extra = {}
     if options.redis is True:
@@ -194,15 +217,12 @@ if __name__ == '__main__':
                 redis_storage_object.redis,
                 options.redis_channels
             )
-            # Build our server protocol.
+            # Build our server reactor.
             web_socket_instance = build_reactor(
                 options,
                 storage_object=redis_storage_object,
                 pubsub_listener=redis_pubsub
             )
-            # Setup our pubsub listener now that we have
-            # access to the web_socket_instance.
-
     else:
         build_reactor(options)
     reactor.run()

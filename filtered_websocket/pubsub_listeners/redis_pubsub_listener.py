@@ -1,8 +1,4 @@
-from filters.base import StorageObjectPubSubFilter
-from base import BasePubSubListener
-
-
-class RedisPubSubListener(BasePubSubListener):
+class RedisPubSubListener(object):
 
     kill_channel = "__KILL__"
 
@@ -10,8 +6,6 @@ class RedisPubSubListener(BasePubSubListener):
         self.redis_client = redis_client
         if channels is None:
             channels = ["global"]
-        # The __KILL__ channel is used to coerce the thread
-        # to finish in kill()
         channels += [self.kill_channel]
         self.pubsub = self.redis_client.pubsub()
         self.pubsub.subscribe(channels)
@@ -21,9 +15,11 @@ class RedisPubSubListener(BasePubSubListener):
         self.__KILL__ = True
         self.redis_client.publish(self.kill_channel, "#YOLO")
 
-    def listen(self, web_socket_instance):
+    def listener(self, web_socket_instance):
+        # Adds data to the web_socket_instance's queue so that
+        # a consumer can act on it.
         for data in self.pubsub.listen():
-            StorageObjectPubSubFilter.run(web_socket_instance, data)
+            web_socket_instance.queue.append(data)
             if self.__KILL__ is True:
                 self.pubsub.unsubscribe()
                 break
