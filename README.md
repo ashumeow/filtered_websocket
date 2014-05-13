@@ -123,6 +123,7 @@ Redis back end support allows shared storage with other applications.
     build_reactor(options, **extra)
 
 The redis pubsub_listener places all redis pubsub events in a queue where it may be handled by WebSocketConsumerFilter filters.
+    
     redis_storage_object = RedisStorageObject(
         host=options.redis_host,
         port=options.redis_port,
