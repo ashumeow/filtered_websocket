@@ -23,10 +23,13 @@ New behaviors are added by simply importing filter modules.
 ###### Install 
     pip install filtered_websocket
 
-###### Run Default Server
-    python -m filtered_websocket.server -h
+###### Run The Server With Default Filters (stdout_messages and broadcast_messages_by_token)
+    python -m filtered_websocket.server
    
 ###### Build a unique server from the CLI using filters as arguments
+
+    # It should generally be un-necessary to touch server.py unless you want to write your own storage back ends or pubsub listeners.
+    # Instead write filter modules and import them at runtime like so:
     # The server below will broadcast messages to all connected clients and print all
     # data passing through it to stdout. 
     python -m filtered_websocket.server -f "filtered_websocket.filters.broadcast_messages" "filtered_websocket.filters.stdout_rawdata"
@@ -91,7 +94,7 @@ To create a new filter simply inherit from one of the base filter classes.
             sys.stdout.writelines("--RAWDATA--\n%s\n" % data)
             sys.stdout.flush()
 
-*example: chat_server.py*
+*example: chat_server*
 
     # Just import the filters you'd like at runtime instead of touching server.py
     python -m filtered_websocket.server -f "filtered_websocket.filters.broadcast_messages"

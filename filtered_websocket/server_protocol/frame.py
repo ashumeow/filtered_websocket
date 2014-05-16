@@ -7,10 +7,15 @@ from .exception import FrameError
 
 # FIXING P3 BACKWARD COMPATIBILITY WITH 8(o.o)8 patching.
 if sys.version_info > (3, 0, 0):
+    # aliases
     xrange = range
-    ord = lambda x: x
-    hexbytes = lambda x: bytes([x])
     unichr = chr
+    # unlike 3.x uses byte arrays instead of strings
+    # no need for ord on a byte array :p
+    ord = lambda x: x
+    # 3.x doesn't gracefully convert things chr(129) to \x81
+    hexbytes = lambda x: bytes([x])
+    # creates the closest possible equivalent to a 2.x string
     chr = lambda x: bytes(unichr(x).encode("ascii"))
 else:
     hexbytes = chr
@@ -19,14 +24,16 @@ else:
 class Frame(object):
 
     def __init__(self,  buf):
-        self.buf = buf
-        self.msg = b""
+        # HEADER FIELDS
         self.mask = 0
         self.key = b""
         self.len = 0
         self.fin = 0
         self.payload = 0
         self.opcode = 0
+
+        self.buf = buf
+        self.msg = b""
         self.frame_length = 0
         self.isReady()
 
