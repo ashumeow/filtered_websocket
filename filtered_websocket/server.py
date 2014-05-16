@@ -72,6 +72,14 @@ class FilteredWebSocketFactory(Factory):
             token=self.token
         )
 
+    def consumer(self):
+        """
+        Called in a reactor loop to enable the producer/consumer pattern.
+        """
+        if len(self.queue) > 0:
+            data = self.queue.pop()
+            WebSocketConsumerFilter.run(self, data)
+
 
 def default_parser():
     parser = argparse.ArgumentParser()
@@ -108,16 +116,6 @@ def default_parser():
     return parser
 
 
-def consumer(web_socket_instance):
-    """
-    Called in a reactor loop to enable the producer/consumer pattern.
-    """
-    queue = web_socket_instance.queue
-    if len(queue) > 0:
-        data = queue.pop()
-        WebSocketConsumerFilter.run(web_socket_instance, data)
-
-
 def build_reactor(options, **kwargs):
     web_socket_instance = FilteredWebSocketFactory(**kwargs)
     pubsub_listener = kwargs.pop("pubsub_listener", None)
@@ -145,8 +143,7 @@ def build_reactor(options, **kwargs):
 
     # Start the consumer loop
     consumer_loop = LoopingCall(
-        consumer,
-        web_socket_instance
+        web_socket_instance.consumer
     )
     consumer_loop.start(0.01, now=False)
     return web_socket_instance
