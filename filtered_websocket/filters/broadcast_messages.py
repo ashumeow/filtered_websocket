@@ -1,4 +1,6 @@
-from base import WebSocketMessageFilter
+from __future__ import absolute_import
+
+from .base import WebSocketMessageFilter
 
 
 class BroadcastMessagesFilter(WebSocketMessageFilter):

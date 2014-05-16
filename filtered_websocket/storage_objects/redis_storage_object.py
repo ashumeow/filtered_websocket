@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 import redis
 import redis_collections
 
-from default_storage_object import BasePubSubStorageObject
+from .default_storage_object import BasePubSubStorageObject
 
 
 def redis_parser(parser):

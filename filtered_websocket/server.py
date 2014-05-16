@@ -7,17 +7,19 @@ Create WebSocket servers by composing filter chains.
 
 """
 
+from __future__ import absolute_import
+
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
-from TwistedWebsocket.server import Protocol
+from .TwistedWebsocket.server import Protocol
 import argparse
 import json
 import ssl
 import sys
 
-from storage_objects.default_storage_object import DefaultStorageObject
-from filters.base import (
+from .storage_objects.default_storage_object import DefaultStorageObject
+from .filters.base import (
     WebSocketDataFilter,
     WebSocketMessageFilter,
     WebSocketDisconnectFilter,
@@ -184,8 +186,8 @@ def config_deserializer(filename):
 
 if __name__ == '__main__':
     import importlib
-    from storage_objects.redis_storage_object import RedisStorageObject, redis_parser
-    from pubsub_listeners.redis_pubsub_listener import RedisPubSubListener
+    from .storage_objects.redis_storage_object import RedisStorageObject, redis_parser
+    from .pubsub_listeners.redis_pubsub_listener import RedisPubSubListener
 
     parser = default_parser()
     parser = redis_parser(parser)
@@ -197,7 +199,33 @@ if __name__ == '__main__':
 
     # If no filters are specified this will be imported.
     # the broadcast_by_message filter just creates a simple broadcast server
-    FILTERS = ["filters.broadcast_messages_by_token", "filters.stdout_messages"]
+    FILTERS = [
+        "filtered_websocket.filters.broadcast_messages_by_token",
+        "filtered_websocket.filters.stdout_messages",
+    ]
+
+    # Extra args to set up custom storage (redis in this case)
+    extra = {}
+    if options.redis is True:
+        FILTERS += ["filtered_websocket.filters.broadcast_pubsub"]
+        redis_storage_object = RedisStorageObject(
+            host=options.redis_host,
+            port=options.redis_port,
+            key=options.redis_key
+        )
+        redis_pubsub = RedisPubSubListener(
+            redis_storage_object.redis,
+            options.redis_channels
+        )
+        # Build our server reactor.
+        web_socket_instance = build_reactor(
+            options,
+            storage_object=redis_storage_object,
+            pubsub_listener=redis_pubsub
+        )
+    else:
+        build_reactor(options)
+
     if options.filters is not None:
         FILTERS = options.filters
 
@@ -205,24 +233,4 @@ if __name__ == '__main__':
     for _filter in FILTERS:
         importlib.import_module(_filter)
 
-    # Extra args to set up custom storage (redis in this case)
-    extra = {}
-    if options.redis is True:
-            redis_storage_object = RedisStorageObject(
-                host=options.redis_host,
-                port=options.redis_port,
-                key=options.redis_key
-            )
-            redis_pubsub = RedisPubSubListener(
-                redis_storage_object.redis,
-                options.redis_channels
-            )
-            # Build our server reactor.
-            web_socket_instance = build_reactor(
-                options,
-                storage_object=redis_storage_object,
-                pubsub_listener=redis_pubsub
-            )
-    else:
-        build_reactor(options)
     reactor.run()
