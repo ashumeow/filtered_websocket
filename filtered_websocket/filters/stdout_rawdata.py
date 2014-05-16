@@ -4,7 +4,7 @@ import sys
 from .base import WebSocketDataFilter
 
 
-class BroadcastMessageFilter(WebSocketDataFilter):
+class StdoutRawDataFilter(WebSocketDataFilter):
 
     @classmethod
     def filter(cls, web_socket_instance, data):
