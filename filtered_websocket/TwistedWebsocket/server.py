@@ -61,7 +61,8 @@ class Protocol(BaseProtocol, object):
             print(e)
             self.transport.abortConnection()
         else:
-            self.transport.write(b"".join([chr(ord(c)) for c in hc]))
+            _write = b"".join([chr(ord(c)) for c in hc])
+            self.transport.write(_write)
             self.websocket_ready = True
 
     def dataReceived(self, data):
@@ -100,7 +101,8 @@ class Protocol(BaseProtocol, object):
         self.bufferOut += Frame.buildMessage(msg, mask=False)
         if not self.websocket_ready:
             return
-        self.transport.write(b"".join([chr(ord(c)) for c in self.bufferOut]))
+        _write = b"".join([chr(ord(c)) for c in self.bufferOut])
+        self.transport.write(_write)
         self.bufferOut = b""
 
     def onHandshake(self, header):
