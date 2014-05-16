@@ -22,7 +22,7 @@ class Protocol(BaseProtocol, object):
         self.websocket_ready = False
 
     @staticmethod
-    def buildHandcheckHeader(key):
+    def buildHandshakeHeader(key):
         _response = b""
         _response += b"HTTP/1.1 101 Web Socket Protocol Handshake\r\n"
         _response += b"Upgrade: WebSocket\r\n"
@@ -32,7 +32,7 @@ class Protocol(BaseProtocol, object):
         _response += b"\r\n\r\n"
         return _response
 
-    def buildHandcheck(self):
+    def buildHandshake(self):
         buf = self.bufferIn
         pos_check = re.compile(b"\r\n\r\n")
         pos = pos_check.search(buf).span()[0]
@@ -49,12 +49,12 @@ class Protocol(BaseProtocol, object):
         self.key = key
         key = bytes(key) + b"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
         key = base64.b64encode(hashlib.sha1(key).digest())
-        handshake = Protocol.buildHandcheckHeader(key)
+        handshake = Protocol.buildHandshakeHeader(key)
         return handshake
 
-    def sendHandcheck(self):
+    def sendHandshake(self):
         try:
-            hc = self.buildHandcheck()
+            hc = self.buildHandshake()
         except ProtocolError:
             pass
         except Exception as e:
@@ -67,7 +67,7 @@ class Protocol(BaseProtocol, object):
     def dataReceived(self, data):
         self.bufferIn += data
         if not self.websocket_ready:
-            self.sendHandcheck()
+            self.sendHandshake()
             self.onConnect()
         else:
             try:
