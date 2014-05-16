@@ -29,14 +29,14 @@ New behaviors are added by simply importing filter modules.
 ###### Build a unique server from the CLI using filters as arguments
     # The server below will broadcast messages to all connected clients and print all
     # data passing through it to stdout. 
-    python -m filtered_websocket.server -f "filters.broadcast_messages" "filters.stdout_rawdata"
+    python -m filtered_websocket.server -f "filtered_websocket.filters.broadcast_messages" "filtered_websocket.filters.stdout_rawdata"
 
 ###### Define a unique server via a json config file
     # config.json
     {
         "port": "9000",
         "flags": ["redis"],
-        "filters": ["filters.broadcast_messages_by_token", "filters.stdout_messages"]
+        "filters": ["filtered_websocket.filters.broadcast_messages_by_token", "filtered_websocket.filters.stdout_messages"]
     }
 
     # Passing it in creates a broadcast by token server with backed by redis which prints all messages to stdout
@@ -46,8 +46,11 @@ New behaviors are added by simply importing filter modules.
 
 Filter chains are implemented like so:
 
+    >>> class AFilter(FilterMeta)
+    >>>     pass
+    >>>
+    >>> @add_metaclass(AFilter)
     >>> class A(FilterBase):
-    >>>     class __metaclass__(FilterMeta):
     >>>         pass
     
     >>> Class B(A):
@@ -90,26 +93,8 @@ To create a new filter simply inherit from one of the base filter classes.
 
 *example: chat_server.py*
 
-    from filtered_websocket.server import * 
-    from filtered_websocket.filters import broadcast_messages 
-
-
-    parser = default_parser()
-    build_reactor(parser.parse_args(sys.argv[1:]))
-    reactor.run()
-
-*chat_server.py output*
-
-    ./chat_server.py --help
-    usage: chat_server.py [-h] [-p PORT] [-key KEY] [-cert CERT] [-token TOKEN]
-
-    optional arguments:
-      -h, --help            show this help message and exit
-      -p PORT, --port PORT  The listening port.
-      -key KEY              A key file (ssl).
-      -cert CERT            A certificate file (ssl).
-      -token TOKEN          Set a default token.
-
+    # Just import the filters you'd like at runtime instead of touching server.py
+    python -m filtered_websocket.server -f "filtered_websocket.filters.broadcast_messages"
 
 Redis back end support allows shared storage with other applications.
 
