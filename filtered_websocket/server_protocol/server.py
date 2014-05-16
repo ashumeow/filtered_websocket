@@ -9,18 +9,6 @@ from .exception import FrameError, ProtocolError
 from .frame import Frame
 
 
-handshake = '\
-HTTP/1.1 101 Web Socket Protocol Handshake\r\n\
-Upgrade: WebSocket\r\n\
-Connection: Upgrade\r\n\
-Sec-WebSocket-Accept: %s\r\n\r\n\
-'
-
-
-#
-# Server protocol
-#
-
 class Protocol(BaseProtocol, object):
 
     def __init__(self, users=None):
@@ -32,6 +20,17 @@ class Protocol(BaseProtocol, object):
         self.id = uuid.uuid4()
         self.users[self.id] = self
         self.websocket_ready = False
+
+    @staticmethod
+    def buildHandcheckHeader(key):
+        _response = b""
+        _response += b"HTTP/1.1 101 Web Socket Protocol Handshake\r\n"
+        _response += b"Upgrade: WebSocket\r\n"
+        _response += b"Connection: Upgrade\r\n"
+        _response += b"Sec-WebSocket-Accept: "
+        _response += key
+        _response += b"\r\n\r\n"
+        return _response
 
     def buildHandcheck(self):
         buf = self.bufferIn
@@ -48,9 +47,11 @@ class Protocol(BaseProtocol, object):
             raise Exception("Missing Key")
         key = key.group(1)
         self.key = key
-        key = str(key) + u"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-        key = base64.b64encode(hashlib.sha1(key.encode("utf-8")).digest())
-        return handshake % key.decode("utf-8")
+        key = bytes(key) + b"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+        key = base64.b64encode(hashlib.sha1(key).digest())
+        handshake = Protocol.buildHandcheckHeader(key)
+        print(handshake)
+        return handshake
 
     def sendHandcheck(self):
         try:
@@ -61,8 +62,7 @@ class Protocol(BaseProtocol, object):
             print(e)
             self.transport.abortConnection()
         else:
-            _write = b"".join([chr(ord(c)) for c in hc])
-            self.transport.write(_write)
+            self.transport.write(hc)
             self.websocket_ready = True
 
     def dataReceived(self, data):
@@ -101,8 +101,7 @@ class Protocol(BaseProtocol, object):
         self.bufferOut += Frame.buildMessage(msg, mask=False)
         if not self.websocket_ready:
             return
-        _write = b"".join([chr(ord(c)) for c in self.bufferOut])
-        self.transport.write(_write)
+        self.transport.write(self.bufferOut)
         self.bufferOut = b""
 
     def onHandshake(self, header):

@@ -1,7 +1,16 @@
 from __future__ import absolute_import
 
+import sys
 import random
 from .exception import FrameError
+
+
+# FIXING P3 BACKWARD COMPATIBILITY WITH 8(o.o)8 patching.
+
+if sys.version_info > (3, 0, 0):
+    xrange = range
+    ord = lambda x: x
+    chr = bytes
 
 
 class Frame(object):
@@ -21,7 +30,7 @@ class Frame(object):
     def isReady(self):
         buf = self.buf
         if len(buf) < 2:
-            raise FrameError("Incomplet Frame: HEADER DATA")
+            raise FrameError("Incomplete Frame: HEADER DATA")
         self.fin = ord(buf[0]) >> 7
         self.opcode = ord(buf[0]) & 0b1111
         self.payload = ord(buf[1]) & 0b1111111
@@ -34,9 +43,9 @@ class Frame(object):
             else:
                 self.frame_length = 2 + self.len
             if self.frame_length > len(self.buf):
-                raise FrameError("Incomplet Frame: FRAME DATA")
+                raise FrameError("Incomplete Frame: FRAME DATA")
             if len(buf) < 4 and self.mask:
-                raise FrameError("Incomplet Frame: KEY DATA")
+                raise FrameError("Incomplete Frame: KEY DATA")
             if self.mask:
                 self.key = buf[:4]
                 buf = buf[4:4+len(buf)+1]
@@ -45,15 +54,15 @@ class Frame(object):
 
         elif self.payload == 126:
             if len(buf) < 6 and self.mask:
-                raise FrameError("Incomplet Frame: KEY DATA")
+                raise FrameError("Incomplete Frame: KEY DATA")
             for k, i in [(0, 1), (1, 0)]:
-                self.len += (ord(buf[k]) * 1 << (8*i))
+                self.len += ord(buf[k]) * 1 << (8*i)
             if self.mask:
                 self.frame_length = 8 + self.len
             else:
                 self.frame_length = 4 + self.len
             if self.frame_length > len(self.buf):
-                raise FrameError("Incomplet Frame: FRAME DATA")
+                raise FrameError("Incomplete Frame: FRAME DATA")
             buf = buf[2:]
             if self.mask:
                 self.key = buf[:4]
@@ -63,15 +72,15 @@ class Frame(object):
 
         else:
             if len(buf) < 10 and self.mask:
-                raise FrameError("Incomplet Frame: KEY DATA")
+                raise FrameError("Incomplete Frame: KEY DATA")
             for k, i in [(0, 7), (1, 6), (2, 5), (3, 4), (4, 3), (5, 2), (6, 1), (7, 0)]:
-                self.len += (ord(buf[k]) * 1 << (8*i))
+                self.len += ord(buf[k]) * 1 << (8*i)
             if self.mask:
                 self.frame_length = 14 + self.len
             else:
                 self.frame_length = 10 + self.len
             if self.frame_length > len(self.buf):
-                raise FrameError("Incomplet Frame: FRAME DATA")
+                raise FrameError("Incomplete Frame: FRAME DATA")
             buf = buf[8:]
             if self.mask:
                 self.key = buf[:4]
@@ -86,7 +95,7 @@ class Frame(object):
         decoded_msg = b""
         for i in xrange(self.len):
             c = ord(self.msg[i]) ^ ord(self.key[i % 4])
-            decoded_msg += unichr(c)
+            decoded_msg += chr(c)
         return decoded_msg
 
     def length(self):
@@ -98,25 +107,25 @@ class Frame(object):
         buf_len = len(buf)
         for i in xrange(buf_len):
             c = ord(buf[i]) ^ ord(key[i % 4])
-            encoded_msg += unicode(chr(c))
+            encoded_msg += chr(c)
         return encoded_msg
 
     @staticmethod
     def buildMessage(buf,  mask=True):
         msg = b""
         if mask:
-            key = b"".join([unichr(random.randrange(1, 255)) for i in xrange(4)])
+            key = b"".join([chr(random.randrange(1, 255)) for i in xrange(4)])
         #first byte
         o = (1 << 7) + 1
-        msg += unichr(o)
+        msg += chr(o)
         #second byte
         buf_len = len(buf)
         if buf_len < 126:
             o = buf_len
             if mask:
-                msg += unichr(o + (1 << 7))
+                msg += chr(o + (1 << 7))
             else:
-                msg += unichr(o)
+                msg += chr(o)
             if mask:
                 msg += key
                 msg += Frame.encodeMessage(buf, key)
@@ -126,12 +135,12 @@ class Frame(object):
 
         if buf_len <= ((1 << 16) - 1):
             if mask:
-                msg += unichr(126 + (1 << 7))
+                msg += chr(126 + (1 << 7))
             else:
-                msg += unichr(126)
+                msg += chr(126)
             for i in range(1, 3):
                 o = (buf_len >> (16 - (8*i))) & (2**8 - 1)
-                msg += unichr(o)
+                msg += chr(o)
             if mask:
                 msg += key
                 msg += Frame.encodeMessage(buf, key)
@@ -141,12 +150,12 @@ class Frame(object):
 
         if buf_len <= ((1 << 64) - 1):
             if mask:
-                msg += unichr(127 + (1 << 7))
+                msg += chr(127 + (1 << 7))
             else:
-                msg += unichr(127)
+                msg += chr(127)
             for i in range(1, 9):
                 o = (buf_len >> (64 - (8*i))) & (2**8 - 1)
-                msg += unichr(o)
+                msg += chr(o)
             if mask:
                 msg += key
                 msg += Frame.encodeMessage(buf, key)

@@ -12,7 +12,7 @@ from __future__ import absolute_import
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
-from .TwistedWebsocket.server import Protocol
+from .server_protocol.server import Protocol
 import argparse
 import json
 import ssl
