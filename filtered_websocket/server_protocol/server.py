@@ -50,7 +50,6 @@ class Protocol(BaseProtocol, object):
         key = bytes(key) + b"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
         key = base64.b64encode(hashlib.sha1(key).digest())
         handshake = Protocol.buildHandcheckHeader(key)
-        print(handshake)
         return handshake
 
     def sendHandcheck(self):

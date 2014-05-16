@@ -6,11 +6,14 @@ from .exception import FrameError
 
 
 # FIXING P3 BACKWARD COMPATIBILITY WITH 8(o.o)8 patching.
-
 if sys.version_info > (3, 0, 0):
     xrange = range
     ord = lambda x: x
-    chr = bytes
+    hexbytes = lambda x: bytes([x])
+    unichr = chr
+    chr = lambda x: bytes(unichr(x).encode("ascii"))
+else:
+    hexbytes = chr
 
 
 class Frame(object):
@@ -116,8 +119,7 @@ class Frame(object):
         if mask:
             key = b"".join([chr(random.randrange(1, 255)) for i in xrange(4)])
         #first byte
-        o = (1 << 7) + 1
-        msg += chr(o)
+        msg += b"\x81"
         #second byte
         buf_len = len(buf)
         if buf_len < 126:
@@ -130,7 +132,10 @@ class Frame(object):
                 msg += key
                 msg += Frame.encodeMessage(buf, key)
             else:
-                msg += buf
+                if isinstance(buf, bytes):
+                    msg += buf
+                else:
+                    msg += bytes(buf.encode("utf-8"))
             return msg
 
         if buf_len <= ((1 << 16) - 1):
@@ -140,7 +145,7 @@ class Frame(object):
                 msg += chr(126)
             for i in range(1, 3):
                 o = (buf_len >> (16 - (8*i))) & (2**8 - 1)
-                msg += chr(o)
+                msg += hexbytes(o)
             if mask:
                 msg += key
                 msg += Frame.encodeMessage(buf, key)
@@ -155,7 +160,7 @@ class Frame(object):
                 msg += chr(127)
             for i in range(1, 9):
                 o = (buf_len >> (64 - (8*i))) & (2**8 - 1)
-                msg += chr(o)
+                msg += hexbytes(o)
             if mask:
                 msg += key
                 msg += Frame.encodeMessage(buf, key)

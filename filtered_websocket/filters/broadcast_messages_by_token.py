@@ -15,7 +15,8 @@ class TokenMessageFilter(WebSocketMessageFilter):
 
     @classmethod
     def filter(cls, web_socket_instance, msg):
-        token = re.search("token:([^\s]*)", msg)
+        token_check = re.compile(b"token:([^\s]*)")
+        token = token_check.search(msg)
         if token is not None:
             web_socket_instance.token = token.group(1)
             logging.debug("Registering %s with broadcast group: %s" % (web_socket_instance.id, token.group(1)))
