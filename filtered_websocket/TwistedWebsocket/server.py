@@ -35,30 +35,34 @@ class Protocol(BaseProtocol, object):
 
     def buildHandcheck(self):
         buf = self.bufferIn
-        pos = buf.find("\r\n\r\n")
+        pos_check = re.compile(b"\r\n\r\n")
+        pos = pos_check.search(buf).span()[0]
         if pos == -1:
-            raise ProtocolError("Incomplet Handshake")
+            raise ProtocolError("Incomplete Handshake")
         self.onHandshake(buf)
         cmd = buf[:pos+5]
         self.bufferIn = buf[pos+4:]
-        key = re.search("Sec-WebSocket-Key:\s*(\S+)\s*", cmd)
+        key_check = re.compile(b"Sec-WebSocket-Key:\s*(\S+)\s*")
+        key = key_check.search(cmd)
         if not key:
             raise Exception("Missing Key")
         key = key.group(1)
         self.key = key
-        key = key+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
-        key = base64.b64encode(hashlib.sha1(key).digest())
-        return handshake % key
+        key = str(key) + u"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+        key = base64.b64encode(hashlib.sha1(key.encode("utf-8")).digest())
+        return handshake % key.decode("utf-8")
 
     def sendHandcheck(self):
         try:
             hc = self.buildHandcheck()
         except ProtocolError:
             pass
-        except Exception:
-                self.transport.abortConnection()
+        except Exception as e:
+            print(e)
+            self.transport.abortConnection()
         else:
-            self.transport.write(hc)
+            _write = b"".join([chr(ord(c)) for c in hc])
+            self.transport.write(_write)
             self.websocket_ready = True
 
     def dataReceived(self, data):
@@ -97,7 +101,8 @@ class Protocol(BaseProtocol, object):
         self.bufferOut += Frame.buildMessage(msg, mask=False)
         if not self.websocket_ready:
             return
-        self.transport.write("".join([chr(ord(c)) for c in self.bufferOut]))
+        _write = b"".join([chr(ord(c)) for c in self.bufferOut])
+        self.transport.write(_write)
         self.bufferOut = b""
 
     def onHandshake(self, header):

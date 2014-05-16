@@ -203,6 +203,29 @@ if __name__ == '__main__':
         "filtered_websocket.filters.broadcast_messages_by_token",
         "filtered_websocket.filters.stdout_messages",
     ]
+
+    # Extra args to set up custom storage (redis in this case)
+    extra = {}
+    if options.redis is True:
+        FILTERS += ["filtered_websocket.filters.broadcast_pubsub"]
+        redis_storage_object = RedisStorageObject(
+            host=options.redis_host,
+            port=options.redis_port,
+            key=options.redis_key
+        )
+        redis_pubsub = RedisPubSubListener(
+            redis_storage_object.redis,
+            options.redis_channels
+        )
+        # Build our server reactor.
+        web_socket_instance = build_reactor(
+            options,
+            storage_object=redis_storage_object,
+            pubsub_listener=redis_pubsub
+        )
+    else:
+        build_reactor(options)
+
     if options.filters is not None:
         FILTERS = options.filters
 
@@ -210,24 +233,4 @@ if __name__ == '__main__':
     for _filter in FILTERS:
         importlib.import_module(_filter)
 
-    # Extra args to set up custom storage (redis in this case)
-    extra = {}
-    if options.redis is True:
-            redis_storage_object = RedisStorageObject(
-                host=options.redis_host,
-                port=options.redis_port,
-                key=options.redis_key
-            )
-            redis_pubsub = RedisPubSubListener(
-                redis_storage_object.redis,
-                options.redis_channels
-            )
-            # Build our server reactor.
-            web_socket_instance = build_reactor(
-                options,
-                storage_object=redis_storage_object,
-                pubsub_listener=redis_pubsub
-            )
-    else:
-        build_reactor(options)
     reactor.run()

@@ -27,6 +27,8 @@ bar
 
 from __future__ import absolute_import
 
+from six import add_metaclass
+
 
 class FilterBase(object):
     @classmethod
@@ -40,21 +42,44 @@ class FilterBase(object):
 
 
 class FilterMeta(type):
-    def __init__(self, name, _type, other):
+    def __init__(self, name, type, other):
         if self.__base__ is not FilterBase:
             self.__class__._filters.append(self)
         else:
             self.__class__._filters = []
 
 
-def generate_filter_chain(class_name):
-    """
-    Returns a new FilterChain base class of the given name.
-    equivalant to: class class_name(FilterBase, metaclass=FilterMeta):
-    """
-    return FilterMeta(class_name, (FilterBase,), {})
+class DataFilterMeta(FilterMeta):
+    pass
 
-WebSocketDataFilter = generate_filter_chain("WebSocketDataFilter")
-WebSocketMessageFilter = generate_filter_chain("WebSocketMessageFilter")
-WebSocketDisconnectFilter = generate_filter_chain("WebSocketDisconnectFilter")
-WebSocketConsumerFilter = generate_filter_chain("WebSocketConsumerFilter")
+
+@add_metaclass(DataFilterMeta)
+class WebSocketDataFilter(FilterBase):
+    pass
+
+
+class MessageFilterMeta(FilterMeta):
+    pass
+
+
+@add_metaclass(MessageFilterMeta)
+class WebSocketMessageFilter(FilterBase):
+    pass
+
+
+class DisconnectFilterMeta(FilterMeta):
+    pass
+
+
+@add_metaclass(DisconnectFilterMeta)
+class WebSocketDisconnectFilter(FilterBase):
+    pass
+
+
+class ConsumerFilterMeta(FilterMeta):
+    pass
+
+
+@add_metaclass(ConsumerFilterMeta)
+class WebSocketConsumerFilter(FilterBase):
+    pass
