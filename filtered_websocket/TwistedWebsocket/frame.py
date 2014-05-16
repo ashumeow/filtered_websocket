@@ -1,5 +1,7 @@
+from __future__ import absolute_import
+
 import random
-from exception import FrameError
+from .exception import FrameError
 
 
 class Frame(object):

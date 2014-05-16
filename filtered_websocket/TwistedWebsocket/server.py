@@ -1,17 +1,12 @@
+from __future__ import absolute_import
+
 import uuid
 import re
 import hashlib
 import base64
 from twisted.internet.protocol import Protocol as BaseProtocol
-from exception import FrameError, ProtocolError
-from frame import Frame
-
-
-#
-# Package info
-#
-__VERSION__ = "0.0.7"
-__DESCRIPTION__ = "Websocket server implementation based on Twisted with SSL support."
+from .exception import FrameError, ProtocolError
+from .frame import Frame
 
 
 handshake = '\
@@ -34,7 +29,7 @@ class Protocol(BaseProtocol, object):
         self.bufferIn = b""
         self.bufferOut = b""
         self.users = users
-        self.id = unicode(uuid.uuid4())
+        self.id = uuid.uuid4()
         self.users[self.id] = self
         self.websocket_ready = False
 

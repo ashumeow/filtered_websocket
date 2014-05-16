@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 import logging
 import re
 
-from base import WebSocketMessageFilter, WebSocketDisconnectFilter
+from .base import WebSocketMessageFilter, WebSocketDisconnectFilter
 
 
 class TokenMessageFilter(WebSocketMessageFilter):

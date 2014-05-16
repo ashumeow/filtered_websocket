@@ -1,5 +1,7 @@
+from __future__ import absolute_import
+
 import sys
-from base import WebSocketConsumerFilter
+from .base import WebSocketConsumerFilter
 
 
 class BroadcastMessageFilter(WebSocketConsumerFilter):

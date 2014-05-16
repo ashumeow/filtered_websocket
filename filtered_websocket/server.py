@@ -7,17 +7,19 @@ Create WebSocket servers by composing filter chains.
 
 """
 
+from __future__ import absolute_import
+
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
-from TwistedWebsocket.server import Protocol
+from .TwistedWebsocket.server import Protocol
 import argparse
 import json
 import ssl
 import sys
 
-from storage_objects.default_storage_object import DefaultStorageObject
-from filters.base import (
+from .storage_objects.default_storage_object import DefaultStorageObject
+from .filters.base import (
     WebSocketDataFilter,
     WebSocketMessageFilter,
     WebSocketDisconnectFilter,
@@ -184,8 +186,8 @@ def config_deserializer(filename):
 
 if __name__ == '__main__':
     import importlib
-    from storage_objects.redis_storage_object import RedisStorageObject, redis_parser
-    from pubsub_listeners.redis_pubsub_listener import RedisPubSubListener
+    from .storage_objects.redis_storage_object import RedisStorageObject, redis_parser
+    from .pubsub_listeners.redis_pubsub_listener import RedisPubSubListener
 
     parser = default_parser()
     parser = redis_parser(parser)
@@ -197,7 +199,10 @@ if __name__ == '__main__':
 
     # If no filters are specified this will be imported.
     # the broadcast_by_message filter just creates a simple broadcast server
-    FILTERS = ["filters.broadcast_messages_by_token", "filters.stdout_messages"]
+    FILTERS = [
+        "filtered_websocket.filters.broadcast_messages_by_token",
+        "filtered_websocket.filters.stdout_messages",
+    ]
     if options.filters is not None:
         FILTERS = options.filters
 
