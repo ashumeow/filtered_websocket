@@ -47,7 +47,8 @@ class FilteredWebSocket(Protocol):
         super(FilteredWebSocket, self).__init__(*args, **kwargs)
 
     def dataReceived(self, data):
-        WebSocketDataFilter.run(self, data)
+        print(WebSocketDataFilter._filters)
+        # WebSocketDataFilter.run(self, data)
         super(FilteredWebSocket, self).dataReceived(data)
 
     def onDisconnect(self):

@@ -25,6 +25,8 @@ bar
 
 """
 
+from six import add_metaclass
+
 
 class FilterBase(object):
     @classmethod
@@ -39,35 +41,43 @@ class FilterBase(object):
 
 class FilterMeta(type):
     def __init__(self, name, type, other):
-        try:
+        if self.__base__ is not FilterBase:
             self.__class__._filters.append(self)
-        except AttributeError:
-            # Anything defined here will only be applied to the class which
-            # inherits from FilterBase
+        else:
             self.__class__._filters = []
 
 
+class DataFilterMeta(FilterMeta):
+    pass
+
+
+@add_metaclass(DataFilterMeta)
 class WebSocketDataFilter(FilterBase):
-
-    class __metaclass__(FilterMeta):
-        pass
+    pass
 
 
+class MessageFilterMeta(FilterMeta):
+    pass
+
+
+@add_metaclass(MessageFilterMeta)
 class WebSocketMessageFilter(FilterBase):
-
-    class __metaclass__(FilterMeta):
-        pass
+    pass
 
 
+class DisconnectFilterMeta(FilterMeta):
+    pass
+
+
+@add_metaclass(DisconnectFilterMeta)
 class WebSocketDisconnectFilter(FilterBase):
-
-    class __metaclass__(FilterMeta):
-        pass
+    pass
 
 
+class ConsumerFilterMeta(FilterMeta):
+    pass
+
+
+@add_metaclass(ConsumerFilterMeta)
 class WebSocketConsumerFilter(FilterBase):
-    """
-    Chain called on any data existing in web_socket_instance.queue.
-    """
-    class __metaclass__(FilterMeta):
-        pass
+    pass

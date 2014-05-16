@@ -11,6 +11,7 @@ setup(
         "twisted",
         "redis",
         "redis_collections",
+        "six",
     ],
     license = "BSD",
     keywords = "websocket TwistedWebsocket",
