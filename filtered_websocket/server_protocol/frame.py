@@ -10,10 +10,10 @@ if sys.version_info > (3, 0, 0):
     # aliases
     xrange = range
     unichr = chr
-    # unlike 3.x uses byte arrays instead of strings
-    # no need for ord on a byte array :p
+    # 3.x uses byte arrays instead of strings
+    # so no need for ord :p
     ord = lambda x: x
-    # 3.x doesn't gracefully convert things chr(129) to \x81
+    # 3.x doesn't gracefully convert non-ascii to hex i.e. chr(129) to \x81
     hexbytes = lambda x: bytes([x])
     # creates the closest possible equivalent to a 2.x string
     chr = lambda x: bytes(unichr(x).encode("ascii"))
@@ -22,16 +22,20 @@ else:
 
 
 class Frame(object):
-
+    """
+    A partial, text only, implementation of the WebSocket protocol.
+    For more info see:
+    http://www.altdevblogaday.com/2012/01/23/writing-your-own-websocket-server/
+    """
     def __init__(self,  buf):
         # HEADER FIELDS
+        self.fin = 0
+        self.opcode = 0
+        self.payload = 0
         self.mask = 0
+
         self.key = b""
         self.len = 0
-        self.fin = 0
-        self.payload = 0
-        self.opcode = 0
-
         self.buf = buf
         self.msg = b""
         self.frame_length = 0
