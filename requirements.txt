@@ -2,3 +2,5 @@ twisted
 redis
 redis_collections
 six
+pyopenssl
+service_identity
