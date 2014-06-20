@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
+
 import unittest
+from six import add_metaclass
+
 from filtered_websocket.filters.base import FilterBase, FilterMeta
 
 
+@add_metaclass(FilterMeta)
 class A(FilterBase):
-    class __metaclass__(FilterMeta):
-        pass
+    pass
 
 
 class B(A):
