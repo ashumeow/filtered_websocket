@@ -19,7 +19,7 @@ class RedisPubSubListener(object):
         # Adds data to the web_socket_instance's queue so that
         # a consumer can act on it.
         for data in self.pubsub.listen():
-            web_socket_instance.queue.append(data)
+            web_socket_instance.queue.put(data)
             if self.__KILL__ is True:
                 self.pubsub.unsubscribe()
                 break

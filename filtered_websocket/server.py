@@ -17,6 +17,11 @@ import argparse
 import json
 import sys
 
+if sys.version_info >= (3, 0, 0):
+    from queue import Queue
+else:
+    from Queue import Queue
+
 from .storage_objects.default_storage_object import DefaultStorageObject
 from .filters.base import (
     WebSocketDataFilter,
@@ -40,8 +45,7 @@ class FilteredWebSocket(Protocol):
         self.token = kwargs.pop("token")
 
         # A queue to be used in any producer/consumer activities
-        # TODO: Implement this as an actual Queue object
-        self.queue = []
+        self.queue = Queue()
 
         super(FilteredWebSocket, self).__init__(*args, **kwargs)
 
@@ -62,7 +66,7 @@ class FilteredWebSocketFactory(Factory):
         self.storage_object = kwargs.get("storage_object", DefaultStorageObject())
         self.token = kwargs.get("token")
         self.users = {}
-        self.queue = []
+        self.queue = Queue()
 
     def buildProtocol(self, _address):
         return FilteredWebSocket(
@@ -75,8 +79,8 @@ class FilteredWebSocketFactory(Factory):
         """
         Called in a reactor loop to enable the producer/consumer pattern.
         """
-        if len(self.queue) > 0:
-            data = self.queue.pop()
+        if not self.queue.empty():
+            data = self.queue.get()
             WebSocketConsumerFilter.run(self, data)
 
 
