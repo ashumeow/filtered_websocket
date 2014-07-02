@@ -14,8 +14,8 @@ class Protocol(BaseProtocol, object):
     def __init__(self, users=None):
         if users is None:
             users = {}
-        self.bufferIn = b""
-        self.bufferOut = b""
+        self.bufferIn = bytearray()
+        self.bufferOut = bytearray()
         self.users = users
         self.id = uuid.uuid4()
         self.users[self.id] = self
@@ -35,9 +35,10 @@ class Protocol(BaseProtocol, object):
     def buildHandshake(self):
         buf = self.bufferIn
         pos_check = re.compile(b"\r\n\r\n")
-        pos = pos_check.search(buf).span()[0]
-        if pos == -1:
+        pos = pos_check.search(buf)
+        if pos is None:
             raise ProtocolError("Incomplete Handshake")
+        pos = pos.span()[0]
         self.onHandshake(buf)
         cmd = buf[:pos+5]
         self.bufferIn = buf[pos+4:]
@@ -100,8 +101,8 @@ class Protocol(BaseProtocol, object):
         self.bufferOut += Frame.buildMessage(msg, mask=False)
         if not self.websocket_ready:
             return
-        self.transport.write(self.bufferOut)
-        self.bufferOut = b""
+        self.transport.write(bytes(self.bufferOut))
+        self.bufferOut = bytearray()
 
     def onHandshake(self, header):
         pass
