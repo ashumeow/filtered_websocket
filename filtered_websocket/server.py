@@ -13,8 +13,8 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor, ssl
 from twisted.internet.task import LoopingCall
 from .server_protocol.server import Protocol
+import collections
 import argparse
-import json
 import sys
 
 if sys.version_info >= (3, 0, 0):
@@ -22,7 +22,6 @@ if sys.version_info >= (3, 0, 0):
 else:
     from Queue import Queue
 
-from .storage_objects.default_storage_object import DefaultStorageObject
 from .filters.base import (
     WebSocketDataFilter,
     WebSocketMessageFilter,
@@ -63,7 +62,10 @@ class FilteredWebSocket(Protocol):
 class FilteredWebSocketFactory(Factory):
 
     def __init__(self, **kwargs):
-        self.storage_object = kwargs.get("storage_object", DefaultStorageObject())
+        self.storage_object = kwargs.get(
+            "storage_object",
+            collections.defaultdict(set)
+        )
         self.token = kwargs.get("token")
         self.users = {}
         self.queue = Queue()
@@ -82,41 +84,6 @@ class FilteredWebSocketFactory(Factory):
         if not self.queue.empty():
             data = self.queue.get()
             WebSocketConsumerFilter.run(self, data)
-
-
-def default_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-p",
-        "--port",
-        help="The listening port.",
-        type=int,
-        default=9000
-    )
-    parser.add_argument(
-        "-c",
-        "--config",
-        help="A JSON config file."
-    )
-    parser.add_argument(
-        "-f",
-        "--filters",
-        help="Filters to import at runtime.",
-        nargs="*"
-    )
-    parser.add_argument(
-        "-key",
-        help="A key file (ssl)."
-    )
-    parser.add_argument(
-        "-cert",
-        help="A certificate file (ssl)."
-    )
-    parser.add_argument(
-        "-token",
-        help="Set a default token value."
-    )
-    return parser
 
 
 def build_reactor(options, **kwargs):
@@ -148,49 +115,60 @@ def build_reactor(options, **kwargs):
     consumer_loop = LoopingCall(
         web_socket_instance.consumer
     )
-    consumer_loop.start(0.01, now=False)
+    consumer_loop.start(0.001, now=False)
     return web_socket_instance
 
 
-def config_deserializer(filename):
-    """
-    Transforms a JSON config file into a list or arguments which may be passed
-    to arg_parser.parse_args.
-
-    For instance:
-
-        {
-            port: 22
-        }
-
-    Would would be transformed to:
-
-        ['--port', '22']
-    """
-    with open(filename, "r") as config_file:
-        config_lines = "".join([l for l in config_file if l[0] != "#"])
-        config_data = json.loads(config_lines)
-        processed_config_data = []
-        for key, value in config_data.items():
-            if key == "flags":
-                for flag in value:
-                    processed_config_data.append("--%s" % flag)
-            else:
-                processed_config_data.append("--%s" % key)
-                if isinstance(value, (list, set)):
-                    processed_config_data += value
-                else:
-                    processed_config_data.append(value)
-    return processed_config_data
+def default_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-p",
+        "--port",
+        help="The listening port.",
+        type=int,
+        default=9000
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        help="A JSON config file."
+    )
+    parser.add_argument(
+        "-f",
+        "--filters",
+        help="Filters to import at runtime.",
+        nargs="*"
+    )
+    parser.add_argument(
+        "-key",
+        help="A key file (ssl)."
+    )
+    parser.add_argument(
+        "-cert",
+        help="A certificate file (ssl)."
+    )
+    return parser
 
 
 if __name__ == '__main__':
+    import os
     import importlib
-    from .storage_objects.redis_storage_object import RedisStorageObject, redis_parser
-    from .pubsub_listeners.redis_pubsub_listener import RedisPubSubListener
+
+    from . import config_deserializer
+    from .storage_objects.base import BasePubSubStorageObject
+
+    # Storage objects are configured via env variables for now,
+    # consider .conf files in the future
+    STORAGE_OBJECT_MODULE = os.environ.get("STORAGE_OBJECT_MODULE", None)
+    if STORAGE_OBJECT_MODULE is None:
+        STORAGE_OBJECT_MODULE = \
+            "filtered_websocket.storage_objects.default"
+
+    storage_object = importlib.import_module(STORAGE_OBJECT_MODULE)
+    StorageObject = storage_object.StorageObject  # NOQA
 
     parser = default_parser()
-    parser = redis_parser(parser)
+    parser = StorageObject.parser(parser)
     options = parser.parse_args(sys.argv[1:])
 
     # A passed in config file will overwrite all other args
@@ -200,28 +178,21 @@ if __name__ == '__main__':
     # If no filters are specified this will be imported.
     # the broadcast_by_message filter just creates a simple broadcast server
     FILTERS = [
-        "filtered_websocket.filters.broadcast_messages_by_token",
+        "filtered_websocket.filters.broadcast_messages",
         "filtered_websocket.filters.stdout_messages",
     ]
 
-    # Extra args to set up custom storage (redis in this case)
-    extra = {}
-    if options.redis is True:
-        FILTERS += ["filtered_websocket.filters.broadcast_pubsub"]
-        redis_storage_object = RedisStorageObject(
-            host=options.redis_host,
-            port=options.redis_port,
-            key=options.redis_key
-        )
-        redis_pubsub = RedisPubSubListener(
-            redis_storage_object.redis,
-            options.redis_channels
+    storage_object_instance = StorageObject(options)
+    if issubclass(StorageObject, BasePubSubStorageObject):
+        storage_object_listener = StorageObject.get_pubsub_listener()(
+            client=storage_object_instance.get_client(),
+            options=options,
         )
         # Build our server reactor.
         web_socket_instance = build_reactor(
             options,
-            storage_object=redis_storage_object,
-            pubsub_listener=redis_pubsub
+            storage_object=storage_object_instance,
+            pubsub_listener=storage_object_listener
         )
     else:
         build_reactor(options)

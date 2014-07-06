@@ -20,12 +20,32 @@ New behaviors are added by simply importing filter modules.
     from filtered_websocket.filters import stdout_rawdata # Adds logging to a server
     from filtered_websocket.filters import broadcast_messages # Broadcasts messages to all connected clients
 
-###### Install 
+###### Quickstart
+
+##### Install 
     pip install filtered_websocket
 
-###### Run The Server With Default Filters (stdout_messages and broadcast_messages_by_token)
+##### A Simple Broadcast Server
+The server should always be started from the command line, with new behaviors specified via importing modules.  By default the server will run on port 9000 with the broadcast_messages filter activated.
+    
+    *start the server*
     python -m filtered_websocket.server
-   
+
+##### Redis Integration
+Custom "storage objects" may be specified by setting the environment variable "STORAGE_OBJECT_MODULE" for instance, to store all user session data in a redis instance:
+
+    export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
+    python -m filtered_websocket.server -h
+
+    *note* changing storage objects will also add new options.
+
+##### Redis PubSub Integration
+
+Storage objects that support pubsub, like redis, may be used for passing messages via filters.  To pass messages broadcasted to a channel "global" to all connected clients via redis run:
+
+    export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
+    python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_pubsub
+
 ###### Build a unique server from the CLI using filters as arguments
 
     # It should generally be un-necessary to touch server.py unless you want to write your own storage back ends or pubsub listeners.

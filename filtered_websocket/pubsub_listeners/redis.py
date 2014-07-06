@@ -2,8 +2,9 @@ class RedisPubSubListener(object):
 
     kill_channel = "__KILL__"
 
-    def __init__(self, redis_client, channels=None):
-        self.redis_client = redis_client
+    def __init__(self, client, options):
+        self.redis_client = client
+        channels = options.redis_channels
         if channels is None:
             channels = ["global"]
         channels += [self.kill_channel]

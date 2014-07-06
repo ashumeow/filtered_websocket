@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from filtered_websocket.server import config_deserializer
+from filtered_websocket.config_deserializer import config_deserializer
 
 
 class ConfigDeserializerTestCase(unittest.TestCase):
