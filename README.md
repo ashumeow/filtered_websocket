@@ -49,10 +49,10 @@ Custom storage objects may be specified by setting the environment variable "STO
 
 ##### Redis PubSub Integration
 
-Storage objects that support pubsub, like redis, may be used for passing messages via filters.  To pass messages broadcasted to a channel "global" to all connected clients via redis run:
+Storage objects that support pubsub, like redis, may be used for passing messages via filters.  To pass messages to all connected clients via a redis channel named "global" run:
 
     export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
-    python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_pubsub
+    python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_pubsub --redis_channels global
 
 ###### Build a unique server from the CLI using filters as arguments
 
