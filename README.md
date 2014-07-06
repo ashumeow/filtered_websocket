@@ -39,27 +39,13 @@ Custom storage objects may be specified by setting the environment variable "STO
     export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
     # Changing the storage object will add new options
     python -m filtered_websocket.server -h
-        usage: server.py [-h] [-p PORT] [-c CONFIG] [-f [FILTERS [FILTERS ...]]]
-                         [-key KEY] [-cert CERT] [--redis_host REDIS_HOST]
-                         [--redis_port REDIS_PORT]
-                         [--redis_channels [REDIS_CHANNELS [REDIS_CHANNELS ...]]]
-                         [--redis_key REDIS_KEY]
+    
+    usage: server.py [-h] [-p PORT] [-c CONFIG] [-f [FILTERS [FILTERS ...]]]
+                     [-key KEY] [-cert CERT] [--redis_host REDIS_HOST]
+                     [--redis_port REDIS_PORT]
+                     [--redis_channels [REDIS_CHANNELS [REDIS_CHANNELS ...]]]
+                     [--redis_key REDIS_KEY]
 
-        optional arguments:
-          -h, --help            show this help message and exit
-          -p PORT, --port PORT  The listening port.
-          -c CONFIG, --config CONFIG
-                                A JSON config file.
-          -f [FILTERS [FILTERS ...]], --filters [FILTERS [FILTERS ...]]
-                                Filters to import at runtime.
-          -key KEY              A key file (ssl).
-          -cert CERT            A certificate file (ssl).
-          --redis_host REDIS_HOST
-          --redis_port REDIS_PORT
-          --redis_channels [REDIS_CHANNELS [REDIS_CHANNELS ...]]
-                                pubsub channels to subscribe to.
-          --redis_key REDIS_KEY
-                                A key prefix.
 
 ##### Redis PubSub Integration
 
