@@ -26,18 +26,40 @@ New behaviors are added by simply importing filter modules.
     pip install filtered_websocket
 
 ##### A Simple Broadcast Server
-The server should always be started from the command line, with new behaviors specified via importing modules.  By default the server will run on port 9000 with the broadcast_messages filter activated.
+The server should always be started from the command line, with new behaviors specified via importing filter modules with the "-f" option.  By default the server will run on port 9000 with the broadcast_messages filter activated.
     
-    *start the server*
+    #  start the server
     python -m filtered_websocket.server
+    # start the server with the broadcast module explicitly
+    python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_messages
 
 ##### Redis Integration
-Custom "storage objects" may be specified by setting the environment variable "STORAGE_OBJECT_MODULE" for instance, to store all user session data in a redis instance:
+Custom storage objects may be specified by setting the environment variable "STORAGE_OBJECT_MODULE" for instance, to store all user session data in a redis instance:
 
     export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
+    # Changing the storage object will add new options
     python -m filtered_websocket.server -h
+        usage: server.py [-h] [-p PORT] [-c CONFIG] [-f [FILTERS [FILTERS ...]]]
+                         [-key KEY] [-cert CERT] [--redis_host REDIS_HOST]
+                         [--redis_port REDIS_PORT]
+                         [--redis_channels [REDIS_CHANNELS [REDIS_CHANNELS ...]]]
+                         [--redis_key REDIS_KEY]
 
-    *note* changing storage objects will also add new options.
+        optional arguments:
+          -h, --help            show this help message and exit
+          -p PORT, --port PORT  The listening port.
+          -c CONFIG, --config CONFIG
+                                A JSON config file.
+          -f [FILTERS [FILTERS ...]], --filters [FILTERS [FILTERS ...]]
+                                Filters to import at runtime.
+          -key KEY              A key file (ssl).
+          -cert CERT            A certificate file (ssl).
+          --redis_host REDIS_HOST
+          --redis_port REDIS_PORT
+          --redis_channels [REDIS_CHANNELS [REDIS_CHANNELS ...]]
+                                pubsub channels to subscribe to.
+          --redis_key REDIS_KEY
+                                A key prefix.
 
 ##### Redis PubSub Integration
 
