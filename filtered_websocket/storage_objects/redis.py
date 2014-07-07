@@ -68,6 +68,6 @@ class StorageObject(BasePubSubStorageObject):
         parser.add_argument(
             "--redis_key",
             help="A key prefix.",
-            default="my_app"
+            default="fws"
         )
         return parser
