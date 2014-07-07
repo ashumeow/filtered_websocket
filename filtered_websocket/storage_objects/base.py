@@ -4,6 +4,9 @@ class BaseStorageObject(object):
         self.options = options  # argparse options
         self.storage = None
 
+    def get(self, item):
+        raise NotImplementedError
+
     def __getitem__(self, item):
         raise NotImplementedError
 

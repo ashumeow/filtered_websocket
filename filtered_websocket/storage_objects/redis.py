@@ -23,6 +23,12 @@ class StorageObject(BasePubSubStorageObject):
     def get_client(self):
         return self.redis
 
+    def get(self, item):
+        return self.storage.get(item)
+
+    def __getitem__(self, item):
+        return self.get(item)
+
     def add(self, key, value):
         current = self.storage.get(key)
         if current is None:
