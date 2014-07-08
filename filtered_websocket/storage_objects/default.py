@@ -18,10 +18,3 @@ class StorageObject(BaseStorageObject):
 
     def __getitem__(self, item):
         return self.get(item)
-
-    @classmethod
-    def parser(cls, parser):
-        """
-        Attach any storage object specific options to the arg parser.
-        """
-        return parser

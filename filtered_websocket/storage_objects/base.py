@@ -16,6 +16,13 @@ class BaseStorageObject(object):
     def remove(self, key, value):
         raise NotImplementedError
 
+    @classmethod
+    def parser(cls, parser):
+        """
+        Intended for attaching additional arguments to an ArgumentParser.
+        """
+        return parser
+
 
 class BasePubSubStorageObject(BaseStorageObject):
     """
