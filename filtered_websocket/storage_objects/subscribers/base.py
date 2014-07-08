@@ -1,4 +1,4 @@
-class BasePubSubListener(object):
+class BaseSubscriber(object):
     """
     The listener method of this object will run in its own thread
     in an infinite loop.

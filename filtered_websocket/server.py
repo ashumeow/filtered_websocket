@@ -88,7 +88,7 @@ class FilteredWebSocketFactory(Factory):
 
 def build_reactor(options, **kwargs):
     web_socket_instance = FilteredWebSocketFactory(**kwargs)
-    pubsub_listener = kwargs.pop("pubsub_listener", None)
+    subscriber = kwargs.pop("subscriber", None)
 
     if options.key and options.cert:
         with open(options.key) as keyFile:
@@ -100,15 +100,15 @@ def build_reactor(options, **kwargs):
             options.port,
             web_socket_instance
         )
-    if pubsub_listener is not None:
+    if subscriber is not None:
         reactor.callInThread(
-            pubsub_listener.listener,
+            subscriber.listener,
             web_socket_instance
         )
         reactor.addSystemEventTrigger(
             "before",
             "shutdown",
-            pubsub_listener.kill
+            subscriber.kill
         )
 
     # Start the consumer loop
@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
     storage_object_instance = StorageObject(options)
     if issubclass(StorageObject, BasePubSubStorageObject):
-        storage_object_listener = StorageObject.get_pubsub_listener()(
+        storage_object_subscriber = StorageObject.get_subscriber()(
             client=storage_object_instance.get_client(),
             options=options,
         )
@@ -192,7 +192,7 @@ if __name__ == '__main__':
         web_socket_instance = build_reactor(
             options,
             storage_object=storage_object_instance,
-            pubsub_listener=storage_object_listener
+            subscriber=storage_object_subscriber
         )
     else:
         build_reactor(options)

@@ -1,7 +1,7 @@
-from .base import BasePubSubListener
+from .base import BaseSubscriber
 
 
-class RedisPubSubListener(BasePubSubListener):
+class RedisSubscriber(BaseSubscriber):
 
     kill_channel = "__KILL__"
 

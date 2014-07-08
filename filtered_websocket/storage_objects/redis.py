@@ -4,7 +4,7 @@ import redis
 import redis_collections
 
 from .base import BasePubSubStorageObject
-from ..pubsub_listeners.redis import RedisPubSubListener
+from .subscribers.redis import RedisSubscriber
 
 
 class StorageObject(BasePubSubStorageObject):
@@ -46,8 +46,8 @@ class StorageObject(BasePubSubStorageObject):
         self.redis.publish(channel, data)
 
     @classmethod
-    def get_pubsub_listener(cls):
-        return RedisPubSubListener
+    def get_subscriber(cls):
+        return RedisSubscriber
 
     @classmethod
     def parser(cls, parser):

@@ -40,9 +40,9 @@ class BasePubSubStorageObject(BaseStorageObject):
         raise NotImplementedError
 
     @classmethod
-    def get_pubsub_listener(cls):
+    def get_subscriber(cls):
         """
-        Return some class which implements a 'listener' method.
-        All listeners should take a an opt
+        Return some class which inherits from:
+        filtered_websocket.storage_objects.subscribers.base.BaseSubscriber
         """
         raise NotImplementedError
