@@ -1,3 +1,4 @@
+fws_server
 setup.cfg
 setup.py
 filtered_websocket/__init__.py
@@ -16,8 +17,6 @@ filtered_websocket/filters/broadcast_pubsub.py
 filtered_websocket/filters/stdout_messages.py
 filtered_websocket/filters/stdout_pubsub.py
 filtered_websocket/filters/stdout_rawdata.py
-filtered_websocket/pubsub_listeners/__init__.py
-filtered_websocket/pubsub_listeners/redis.py
 filtered_websocket/server_protocol/__init__.py
 filtered_websocket/server_protocol/exception.py
 filtered_websocket/server_protocol/frame.py
@@ -26,3 +25,6 @@ filtered_websocket/storage_objects/__init__.py
 filtered_websocket/storage_objects/base.py
 filtered_websocket/storage_objects/default.py
 filtered_websocket/storage_objects/redis.py
+filtered_websocket/storage_objects/subscribers/__init__.py
+filtered_websocket/storage_objects/subscribers/base.py
+filtered_websocket/storage_objects/subscribers/redis.py

@@ -29,16 +29,16 @@ New behaviors are added by simply importing filter modules.
 The server should always be started from the command line, with new behaviors specified via importing filter modules with the "-f" option.  By default the server will run on port 9000 with the broadcast_messages filter activated.
     
     #  start the server
-    python -m filtered_websocket.server
+    fws_server
     # start the server with the broadcast module explicitly
-    python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_messages
+    fws_server -f filtered_websocket.filters.broadcast_messages
 
 ##### Redis Integration
 Custom storage objects may be specified by setting the environment variable "STORAGE_OBJECT_MODULE" for instance, to store all user session data in a redis instance:
 
     export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
     # Changing the storage object will add new options
-    python -m filtered_websocket.server -h
+    fws_server -h
     
     usage: server.py [-h] [-p PORT] [-c CONFIG] [-f [FILTERS [FILTERS ...]]]
                      [-key KEY] [-cert CERT] [--redis_host REDIS_HOST]
@@ -52,7 +52,7 @@ Custom storage objects may be specified by setting the environment variable "STO
 Storage objects that support pubsub, like redis, may be used for passing messages via filters.  To pass messages to all connected clients via a redis channel named "global" run:
 
     export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
-    python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_pubsub --redis_channels global
+    fws_server -f filtered_websocket.filters.broadcast_pubsub --redis_channels global
 
 ###### Define a unique server via a json config file
     # config.json
@@ -63,7 +63,7 @@ Storage objects that support pubsub, like redis, may be used for passing message
     }
 
     # Passing it in creates a broadcast by token server with backed by redis which prints all messages to stdout
-    python -m filtered_websocket.server -c config.json
+    fws_server -c config.json
 
 ###### Create New Filters
 
