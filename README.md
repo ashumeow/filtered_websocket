@@ -55,7 +55,7 @@ Storage objects that support pubsub, like redis, may be used for passing message
     python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_pubsub --redis_channels global
 
 ###### Project Layout 
-    [uml diagram](fws.png)
+![uml diagram](fws.png)
 
 ###### Define a unique server via a json config file
     # config.json
