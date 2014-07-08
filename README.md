@@ -54,13 +54,8 @@ Storage objects that support pubsub, like redis, may be used for passing message
     export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
     python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_pubsub --redis_channels global
 
-###### Build a unique server from the CLI using filters as arguments
-
-    # It should generally be un-necessary to touch server.py unless you want to write your own storage back ends or pubsub listeners.
-    # Instead write filter modules and import them at runtime like so:
-    # The server below will broadcast messages to all connected clients and print all
-    # data passing through it to stdout. 
-    python -m filtered_websocket.server -f "filtered_websocket.filters.broadcast_messages" "filtered_websocket.filters.stdout_rawdata"
+###### Project Layout 
+    [uml diagram](fws.png)
 
 ###### Define a unique server via a json config file
     # config.json
