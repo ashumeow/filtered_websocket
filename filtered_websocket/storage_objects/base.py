@@ -1,7 +1,7 @@
 class BaseStorageObject(object):
 
     def __init__(self, options, *args, **kwargs):
-        self.options = options  # argparse options
+        self.options = options  # Namespace object
         self.storage = None
 
     def get(self, item):
