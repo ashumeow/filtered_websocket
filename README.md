@@ -54,9 +54,6 @@ Storage objects that support pubsub, like redis, may be used for passing message
     export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
     python -m filtered_websocket.server -f filtered_websocket.filters.broadcast_pubsub --redis_channels global
 
-###### Project Layout 
-![uml diagram](fws.png)
-
 ###### Define a unique server via a json config file
     # config.json
     {
@@ -114,40 +111,8 @@ To create a new filter simply inherit from one of the base filter classes.
         """
         @classmethod
         def filter(cls, web_socket_instance, data):
-            sys.stdout.writelines("--RAWDATA--\n%s\n" % data)
-            sys.stdout.flush()
 
-*example: chat_server*
+###### Project Layout 
+![uml diagram](fws.png)
 
-    # Just import the filters you'd like at runtime instead of touching server.py
-    python -m filtered_websocket.server -f "filtered_websocket.filters.broadcast_messages"
 
-Redis back end support allows shared storage with other applications.
-
-    extra = {
-        "storage_object": RedisStorageObject(
-            host=options.redis_host,
-            port=options.redis_port,
-            key=options.redis_key
-        )
-    }
-    build_reactor(options, **extra)
-
-The redis pubsub_listener places all redis pubsub events in a queue where it may be handled by WebSocketConsumerFilter filters.
-    
-    redis_storage_object = RedisStorageObject(
-        host=options.redis_host,
-        port=options.redis_port,
-        key=options.redis_key
-    )
-    redis_pubsub = RedisPubSubListener(
-        redis_storage_object.redis,
-        options.redis_channels
-    )
-    # Build our server reactor.
-    web_socket_instance = build_reactor(
-        options,
-        storage_object=redis_storage_object,
-        pubsub_listener=redis_pubsub
-    )
-     
