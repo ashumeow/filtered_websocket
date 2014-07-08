@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "filtered_websocket",
-    version = "0.4.0",
+    version = "0.4.1",
     author = "Morgan Reece Phillips",
     author_email = "winter2718@gmail.com",
     description = ("A simple framework for constructing websocket servers"
@@ -17,7 +17,7 @@ setup(
     ],
     license = "BSD",
     keywords = "websocket TwistedWebsocket twisted",
-    url = "https://github.com/mrrrgn/filtered_websocket/tarball/0.4.0",
+    url = "https://github.com/mrrrgn/filtered_websocket/tarball/0.4.1",
     packages=[
         "filtered_websocket",
         "filtered_websocket.filters",

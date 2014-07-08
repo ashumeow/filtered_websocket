@@ -9,6 +9,10 @@ from filtered_websocket.storage_objects.base import BasePubSubStorageObject
 from filtered_websocket.config_deserializer import config_deserializer
 from filtered_websocket.server import default_parser, build_reactor
 
+# Modify the python path so that modules in the current directory
+# may be imported.
+sys.path.append(os.path.realpath(os.curdir))
+
 # Storage objects are configured via env variables for now,
 # consider .conf files in the future
 STORAGE_OBJECT_MODULE = os.environ.get("STORAGE_OBJECT_MODULE", None)
