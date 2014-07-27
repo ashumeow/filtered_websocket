@@ -2,10 +2,9 @@
 FilterBase and FilterMeta allow for the simple creation of a filter chains.
 Any class that inherits from a child of FilterBase and FilterMeta
 will have its filter method called upon run being executed from its parent class.
+Here class A constructs a new filter chain, which B and C become members of.
 
-Ex:
-
->>> class A(FilterBase, metaclass=FilterMeta):
+>>> class A(FilterBase, metaclass=FilterMeta)
 >>>         pass
 >>>
 >>> class B(A):
@@ -18,7 +17,7 @@ Ex:
 >>>     def filter(cls, web_socket_instance, data):
 >>>         print("bar")
 >>>
->>> A.run(web_socket_instance)
+>>> A.run(web_socket_instance, None)
 foo
 bar
 
@@ -54,6 +53,10 @@ class DataFilterMeta(FilterMeta):
 
 @add_metaclass(DataFilterMeta)
 class WebSocketDataFilter(FilterBase):
+    """
+    All child classes are run whenever a web socket server instance receives
+    data of any kind.
+    """
     pass
 
 
@@ -63,10 +66,17 @@ class MessageFilterMeta(FilterMeta):
 
 @add_metaclass(MessageFilterMeta)
 class WebSocketMessageFilter(FilterBase):
+    """
+    Runs whenever a web socket server instance receives a full data frame.
+    """
     pass
 
 
 class DisconnectFilterMeta(FilterMeta):
+    """
+    Runs whenever a user disconnects from a web socket server instance
+    (passes in no data).
+    """
     pass
 
 
@@ -81,4 +91,7 @@ class ConsumerFilterMeta(FilterMeta):
 
 @add_metaclass(ConsumerFilterMeta)
 class WebSocketConsumerFilter(FilterBase):
+    """
+    Runs whenever data is popped off of a web socket server instance's queue.
+    """
     pass

@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>filtered_websocket.filters.base &mdash; filtered_websocket 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for filtered_websocket.filters.base</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">FilterBase and FilterMeta allow for the simple creation of a filter chains.</span>
+<span class="sd">Any class that inherits from a child of FilterBase and FilterMeta</span>
+<span class="sd">will have its filter method called upon run being executed from its parent class.</span>
+<span class="sd">Here class A constructs a new filter chain, which B and C become members of.</span>
+
+<span class="sd">&gt;&gt;&gt; class A(FilterBase, metaclass=FilterMeta)</span>
+<span class="sd">&gt;&gt;&gt;         pass</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; class B(A):</span>
+<span class="sd">&gt;&gt;&gt;     @classmethod</span>
+<span class="sd">&gt;&gt;&gt;     def filter(cls, web_socket_instance, data):</span>
+<span class="sd">&gt;&gt;&gt;        print(&quot;foo&quot;)</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; class C(A):</span>
+<span class="sd">&gt;&gt;&gt;     @classmethod</span>
+<span class="sd">&gt;&gt;&gt;     def filter(cls, web_socket_instance, data):</span>
+<span class="sd">&gt;&gt;&gt;         print(&quot;bar&quot;)</span>
+<span class="sd">&gt;&gt;&gt;</span>
+<span class="sd">&gt;&gt;&gt; A.run(web_socket_instance, None)</span>
+<span class="sd">foo</span>
+<span class="sd">bar</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+
+
+<span class="k">class</span> <span class="nc">FilterBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">web_socket_instance</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">for</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_filters</span><span class="p">:</span>
+            <span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">web_socket_instance</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">web_socket_instance</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+
+<span class="k">class</span> <span class="nc">FilterMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__base__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">FilterBase</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">_filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">_filters</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">DataFilterMeta</span><span class="p">(</span><span class="n">FilterMeta</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">DataFilterMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="WebSocketDataFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketDataFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketDataFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    All child classes are run whenever a web socket server instance receives</span>
+<span class="sd">    data of any kind.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<span class="k">class</span> <span class="nc">MessageFilterMeta</span><span class="p">(</span><span class="n">FilterMeta</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">MessageFilterMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="WebSocketMessageFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketMessageFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketMessageFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs whenever a web socket server instance receives a full data frame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<span class="k">class</span> <span class="nc">DisconnectFilterMeta</span><span class="p">(</span><span class="n">FilterMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs whenever a user disconnects from a web socket server instance</span>
+<span class="sd">    (passes in no data).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">DisconnectFilterMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="WebSocketDisconnectFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketDisconnectFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketDisconnectFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+</div>
+<span class="k">class</span> <span class="nc">ConsumerFilterMeta</span><span class="p">(</span><span class="n">FilterMeta</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">ConsumerFilterMeta</span><span class="p">)</span>
+<div class="viewcode-block" id="WebSocketConsumerFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketConsumerFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketConsumerFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs whenever data is popped off of a web socket server instance&#39;s queue.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Morgan Phillips.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

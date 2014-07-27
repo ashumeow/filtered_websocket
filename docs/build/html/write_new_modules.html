@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing Modules &mdash; filtered_websocket 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to filtered_websocket’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to filtered_websocket’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-modules">
+<h1>Writing Modules<a class="headerlink" href="#writing-modules" title="Permalink to this headline">¶</a></h1>
+<p>Introduction:</p>
+<p>In Filtered WebSocket instead of using callbacks new behaviors are added by writing modules which inherit from base filter classes.  Each base class represents an entry point into a chain of modules which will run, in the order in which they were added, whenever some event happens.</p>
+<span class="target" id="module-filtered_websocket.filters.base"></span><p>FilterBase and FilterMeta allow for the simple creation of a filter chains.
+Any class that inherits from a child of FilterBase and FilterMeta
+will have its filter method called upon run being executed from its parent class.
+Here class A constructs a new filter chain, which B and C become members of.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">FilterMeta</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="k">pass</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nd">@classmethod</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">web_socket_instance</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="k">print</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nd">@classmethod</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">web_socket_instance</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="k">print</span><span class="p">(</span><span class="s">&quot;bar&quot;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">web_socket_instance</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="go">foo</span>
+<span class="go">bar</span>
+</pre></div>
+</div>
+<p>There are four filter chains, each corresponding to a callback.</p>
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketDataFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketDataFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketDataFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketDataFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>All child classes are run whenever a web socket server instance receives
+data of any kind.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketMessageFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketMessageFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketMessageFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketMessageFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs whenever a web socket server instance receives a full data frame.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketDisconnectFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketDisconnectFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketDisconnectFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketDisconnectFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketConsumerFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketConsumerFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketConsumerFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketConsumerFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs whenever data is popped off of a web socket server instance&#8217;s queue.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to filtered_websocket&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/write_new_modules.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to filtered_websocket’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Morgan Phillips.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

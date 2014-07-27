@@ -23,7 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="#" /> 
+    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="#" />
+    <link rel="next" title="Filter Module Overview" href="filter_modules_overview.html" /> 
   </head>
   <body>
     <div class="related">
@@ -32,6 +33,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="filter_modules_overview.html" title="Filter Module Overview"
+             accesskey="N">next</a> |</li>
         <li><a href="#">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -43,7 +50,26 @@
             
   <div class="section" id="welcome-to-filtered-websocket-s-documentation">
 <h1>Welcome to filtered_websocket&#8217;s documentation!<a class="headerlink" href="#welcome-to-filtered-websocket-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Filtered WebSocket is a straight forward module system for composing
+complex server&#8217;s without using callbacks or touching protocol classes.</p>
+<p>For instance this module broadcasts messages to all connected users when imported:</p>
+<div class="highlight-python"><div class="highlight"><pre>from filtered_websocket.filters.base import WebSocketMessageFilter
+
+
+Class Broadcast(WebSocketMessageFilter):
+@classmethod
+filter(cls, web_socket_instance, data):
+    for user_id, user_instance in web_socket_instance.users.items():
+        user_instance.sendMessage(bytes(data))
+</pre></div>
+</div>
+<p>To run the broadcast server written above simply run: <tt class="docutils literal"><span class="pre">fws_server</span> <span class="pre">-f</span> <span class="pre">broadcast</span></tt></p>
 <p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="filter_modules_overview.html">Filter Module Overview</a></li>
+</ul>
+</div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -66,6 +92,9 @@
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
+  <h4>Next topic</h4>
+  <p class="topless"><a href="filter_modules_overview.html"
+                        title="next chapter">Filter Module Overview</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -94,6 +123,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="filter_modules_overview.html" title="Filter Module Overview"
+             >next</a> |</li>
         <li><a href="#">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
