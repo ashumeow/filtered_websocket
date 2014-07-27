@@ -4,6 +4,9 @@ from .base import BaseStorageObject
 
 
 class StorageObject(BaseStorageObject):
+    """
+    A storage object which reads and writes to a defaultdict.
+    """
 
     storage = collections.defaultdict(set)
 

@@ -8,7 +8,9 @@ from .subscribers.redis import RedisSubscriber
 
 
 class StorageObject(BasePubSubStorageObject):
-
+    """
+    A storage object which reads and writes to redis, and supports pubsub.
+    """
     def __init__(self, options, *args, **kwargs):
         super(StorageObject, self).__init__(options, *args, **kwargs)
         self.redis = redis.Redis(

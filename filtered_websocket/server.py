@@ -31,6 +31,10 @@ from .filters.base import (
 
 
 class FilteredWebSocket(Protocol):
+    """
+    A twisted protocol defining our websocket server, with filter chains being
+    called within all of it's callbacks.
+    """
 
     def __init__(self, *args, **kwargs):
 
@@ -60,6 +64,12 @@ class FilteredWebSocket(Protocol):
 
 
 class FilteredWebSocketFactory(Factory):
+    """
+    A twisted factory which initializes our server's
+    internal data structures (token, users, and queue).
+    It also defines a method which will be used to consume
+    queue data.
+    """
 
     def __init__(self, **kwargs):
         self.storage_object = kwargs.get(
@@ -87,6 +97,9 @@ class FilteredWebSocketFactory(Factory):
 
 
 def build_reactor(options, **kwargs):
+    """
+    Uses context to attach features to the twisted reactor.
+    """
     web_socket_instance = FilteredWebSocketFactory(**kwargs)
     subscriber = kwargs.pop("subscriber", None)
 
