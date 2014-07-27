@@ -22,7 +22,7 @@ New behaviors are added by simply importing filter modules.
 
 
 ###### Read The Docs
-http://filtered-websocket.readthedocs.org/en/latest/
+http://filtered-websocket.readthedocs.org/en/latest/ (in progress...)
 
 ###### Quickstart
 
