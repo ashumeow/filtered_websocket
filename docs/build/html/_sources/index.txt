@@ -7,7 +7,8 @@ Filtered WebSocket is a straight forward module system for composing
 complex server's without using callbacks or touching protocol classes.
 
 For instance this module broadcasts messages to all connected users when imported::
-
+    
+    # saved as broadcast.py
     from filtered_websocket.filters.base import WebSocketMessageFilter
     
     

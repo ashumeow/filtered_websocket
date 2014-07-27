@@ -20,6 +20,10 @@ New behaviors are added by simply importing filter modules.
     from filtered_websocket.filters import stdout_rawdata # Adds logging to a server
     from filtered_websocket.filters import broadcast_messages # Broadcasts messages to all connected clients
 
+
+###### Read The Docs
+http://filtered-websocket.readthedocs.org/en/latest/
+
 ###### Quickstart
 
 ##### Install 
