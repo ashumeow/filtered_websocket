@@ -59,11 +59,10 @@ It also features redis integration for remote storage and message passing via pu
 </div>
 <div class="section" id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>After installing filtered_websocket you&#8217;ll have access to the server laucher via <tt class="docutils literal"><span class="pre">fws_server</span></tt>.
+<p>After installing filtered_websocket you&#8217;ll have access to the server launcher via <tt class="docutils literal"><span class="pre">fws_server</span></tt>.
 Running <tt class="docutils literal"><span class="pre">fws_server</span> <span class="pre">-h</span></tt> will give you a list of configuration options while simply running <tt class="docutils literal"><span class="pre">fws_server</span></tt>
 will start a server running the default broadcast_messages and stdout_messages modules on port 9000.</p>
-<p>filtered_websocket is batteries included and comes with several useful modules which may be viewed on the &#8220;default modules&#8221; page.
-Modules are attached to a server via the &#8216;-f&#8217; option like so:</p>
+<p>filtered_websocket is bundled with several useful modules which may be attached to a server via the &#8216;-f&#8217; option like so:</p>
 <div class="highlight-python"><div class="highlight"><pre># This will start a server which prints rawdata and broadcasts messages to users who have set a &quot;token&quot;
 &gt;&gt;&gt; fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
 </pre></div>

@@ -16,12 +16,11 @@ Install
 Getting Started
 ---------------
 
-After installing filtered_websocket you'll have access to the server laucher via ``fws_server``.
+After installing filtered_websocket you'll have access to the server launcher via ``fws_server``.
 Running ``fws_server -h`` will give you a list of configuration options while simply running ``fws_server``
 will start a server running the default broadcast_messages and stdout_messages modules on port 9000.
 
-filtered_websocket is batteries included and comes with several useful modules which may be viewed on the "default modules" page.
-Modules are attached to a server via the '-f' option like so::
+filtered_websocket is bundled with several useful modules which may be attached to a server via the '-f' option like so::
 
     # This will start a server which prints rawdata and broadcasts messages to users who have set a "token"
     >>> fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
