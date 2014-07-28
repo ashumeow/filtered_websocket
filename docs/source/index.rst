@@ -5,7 +5,7 @@ Welcome to filtered_websocket's documentation!
 ==============================================
 
 Filtered WebSocket is a straight forward server framework which allows you to compose
-complex server behaviors without using callbacks or subclassing any protocols.
+complex behaviors without using callbacks or subclassing any protocols.
 It also features redis integration for remote storage and message passing via pubsub.
 
 Install
