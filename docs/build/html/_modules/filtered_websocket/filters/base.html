@@ -101,10 +101,9 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">DataFilterMeta</span><span class="p">)</span>
-<div class="viewcode-block" id="WebSocketDataFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketDataFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketDataFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+<div class="viewcode-block" id="WebSocketDataFilter"><a class="viewcode-back" href="../../../writing_modules.html#filtered_websocket.filters.base.WebSocketDataFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketDataFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    All child classes are run whenever a web socket server instance receives</span>
-<span class="sd">    data of any kind.</span>
+<span class="sd">    Runs whenever a web socket server instance receives any data from a client.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 
@@ -114,7 +113,7 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">MessageFilterMeta</span><span class="p">)</span>
-<div class="viewcode-block" id="WebSocketMessageFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketMessageFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketMessageFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+<div class="viewcode-block" id="WebSocketMessageFilter"><a class="viewcode-back" href="../../../writing_modules.html#filtered_websocket.filters.base.WebSocketMessageFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketMessageFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runs whenever a web socket server instance receives a full data frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -122,15 +121,15 @@
 
 </div>
 <span class="k">class</span> <span class="nc">DisconnectFilterMeta</span><span class="p">(</span><span class="n">FilterMeta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Runs whenever a user disconnects from a web socket server instance</span>
-<span class="sd">    (passes in no data).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">DisconnectFilterMeta</span><span class="p">)</span>
-<div class="viewcode-block" id="WebSocketDisconnectFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketDisconnectFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketDisconnectFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+<div class="viewcode-block" id="WebSocketDisconnectFilter"><a class="viewcode-back" href="../../../writing_modules.html#filtered_websocket.filters.base.WebSocketDisconnectFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketDisconnectFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs whenever a user disconnects from a web socket server instance</span>
+<span class="sd">    (passes in no data).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 
 </div>
@@ -139,7 +138,7 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">ConsumerFilterMeta</span><span class="p">)</span>
-<div class="viewcode-block" id="WebSocketConsumerFilter"><a class="viewcode-back" href="../../../module_system_implementation.html#filtered_websocket.filters.base.WebSocketConsumerFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketConsumerFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
+<div class="viewcode-block" id="WebSocketConsumerFilter"><a class="viewcode-back" href="../../../redis_integration.html#filtered_websocket.filters.base.WebSocketConsumerFilter">[docs]</a><span class="k">class</span> <span class="nc">WebSocketConsumerFilter</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runs whenever data is popped off of a web socket server instance&#39;s queue.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

@@ -54,8 +54,7 @@ class DataFilterMeta(FilterMeta):
 @add_metaclass(DataFilterMeta)
 class WebSocketDataFilter(FilterBase):
     """
-    All child classes are run whenever a web socket server instance receives
-    data of any kind.
+    Runs whenever a web socket server instance receives any data from a client.
     """
     pass
 
@@ -73,15 +72,15 @@ class WebSocketMessageFilter(FilterBase):
 
 
 class DisconnectFilterMeta(FilterMeta):
-    """
-    Runs whenever a user disconnects from a web socket server instance
-    (passes in no data).
-    """
     pass
 
 
 @add_metaclass(DisconnectFilterMeta)
 class WebSocketDisconnectFilter(FilterBase):
+    """
+    Runs whenever a user disconnects from a web socket server instance
+    (passes in no data).
+    """
     pass
 
 

@@ -1,4 +1,4 @@
-Filter Module Overview
+Writing Modules
 ================
 
 Introduction:

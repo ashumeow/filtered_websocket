@@ -23,7 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="index.html" /> 
+    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="index.html" />
+    <link rel="next" title="Redis Integration" href="redis_integration.html" />
+    <link rel="prev" title="Welcome to filtered_websocket’s documentation!" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,6 +37,12 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="redis_integration.html" title="Redis Integration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to filtered_websocket’s documentation!"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,7 +54,8 @@
             
   <div class="section" id="writing-modules">
 <h1>Writing Modules<a class="headerlink" href="#writing-modules" title="Permalink to this headline">¶</a></h1>
-<p>Introduction:</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>In Filtered WebSocket instead of using callbacks new behaviors are added by writing modules which inherit from base filter classes.  Each base class represents an entry point into a chain of modules which will run, in the order in which they were added, whenever some event happens.</p>
 <span class="target" id="module-filtered_websocket.filters.base"></span><p>FilterBase and FilterMeta allow for the simple creation of a filter chains.
 Any class that inherits from a child of FilterBase and FilterMeta
@@ -70,12 +79,14 @@ Here class A constructs a new filter chain, which B and C become members of.</p>
 <span class="go">bar</span>
 </pre></div>
 </div>
+<p>Each filter has access to a server instance with a dictionary of user ids mapped to user objects, a storage object, and an optional token object for storing credentials.  It also receives payload data in the form of a bytearray().</p>
+<div class="section" id="filter-module-types">
+<h3>Filter Module Types<a class="headerlink" href="#filter-module-types" title="Permalink to this headline">¶</a></h3>
 <p>There are four filter chains, each corresponding to a callback.</p>
 <dl class="class">
 <dt id="filtered_websocket.filters.base.WebSocketDataFilter">
 <em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketDataFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketDataFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketDataFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>All child classes are run whenever a web socket server instance receives
-data of any kind.</p>
+<dd><p>Runs whenever a web socket server instance receives any data from a client.</p>
 </dd></dl>
 
 <dl class="class">
@@ -87,7 +98,9 @@ data of any kind.</p>
 <dl class="class">
 <dt id="filtered_websocket.filters.base.WebSocketDisconnectFilter">
 <em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketDisconnectFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketDisconnectFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketDisconnectFilter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Runs whenever a user disconnects from a web socket server instance
+(passes in no data).</p>
+</dd></dl>
 
 <dl class="class">
 <dt id="filtered_websocket.filters.base.WebSocketConsumerFilter">
@@ -96,6 +109,65 @@ data of any kind.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="example-module">
+<h3>Example Module<a class="headerlink" href="#example-module" title="Permalink to this headline">¶</a></h3>
+<p>To write a module that responds to some sort of event just make it a subclass of the corresponding parent and override &#8220;filter&#8221; as either a classmethod or a static method.  Let&#8217;s write a rawdata module that responds to my name:</p>
+<div class="highlight-python"><div class="highlight"><pre># Saved as hi_morgan.py
+class HiMorgan(WebSocketDataFilter):
+    @classmethod
+    filter(cls, web_socket_instance, data):
+        payload = bytes(data)
+        if payload.lower().strip() == b&#39;morgan&#39;:
+            print(&#39;Hi Mrrrgn!&#39;)
+</pre></div>
+</div>
+<p>To inject the module into the server import it via the &#8216;-f&#8217; option:</p>
+<div class="highlight-python"><div class="highlight"><pre>fws_server -f hi_morgan
+
+&gt;&gt; echo &quot;Morgan&quot; | nc localhost 9000
+&gt;&gt; Hi Mrrrgn!
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-pipelines-via-data-mutability-run-order">
+<h3>Building Pipelines via Data Mutability &amp; Run Order<a class="headerlink" href="#building-pipelines-via-data-mutability-run-order" title="Permalink to this headline">¶</a></h3>
+<p>Filter modules run in the order that they are imported and may be composed into pipelines.  This is possible because payload data is passed in as a bytearray which is mutable.  The filter below pops the last character off of any data sent, when combined with a default filter module which prints client messages it demonstrates that data has indeed been manipulated en route:</p>
+<div class="highlight-python"><div class="highlight"><pre># Saved as popchar.py
+class PopChar(WebSocketMessageFilter):
+    @classmethod
+    filter(cls, web_socket_instance, data):
+        data.pop()  # remove last character from the bytearray
+
+# Server console
+&gt;&gt;&gt; fws_server -f popchar filtered_websocket.filters.stdout_messages
+
+# From a browser JS console
+&gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
+&gt;&gt;&gt; ws.send(&quot;Test&quot;);
+
+# Server console
+&gt;&gt;&gt; Tes
+</pre></div>
+</div>
+<p>Now, if we reverse the order of the modules the data is printed before the character is popped:</p>
+<div class="highlight-python"><div class="highlight"><pre># Server console
+&gt;&gt;&gt; fws_server -f filtered_websocket.filters.stdout_messages popchar
+
+# From a browser JS console
+&gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
+&gt;&gt;&gt; ws.send(&quot;Test&quot;);
+
+# Server console
+&gt;&gt;&gt; Test
+</pre></div>
+</div>
+</div>
+<div class="section" id="additional-examples">
+<h3>Additional Examples<a class="headerlink" href="#additional-examples" title="Permalink to this headline">¶</a></h3>
+<p>For additional module examples please see the default modules.</p>
+</div>
+</div>
+</div>
 
 
           </div>
@@ -103,9 +175,29 @@ data of any kind.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Writing Modules</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#filter-module-types">Filter Module Types</a></li>
+<li><a class="reference internal" href="#example-module">Example Module</a></li>
+<li><a class="reference internal" href="#building-pipelines-via-data-mutability-run-order">Building Pipelines via Data Mutability &amp; Run Order</a></li>
+<li><a class="reference internal" href="#additional-examples">Additional Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to filtered_websocket&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="redis_integration.html"
+                        title="next chapter">Redis Integration</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/filter_modules_overview.txt"
+    <li><a href="_sources/writing_modules.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -134,6 +226,12 @@ data of any kind.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="redis_integration.html" title="Redis Integration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to filtered_websocket’s documentation!"
+             >previous</a> |</li>
         <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
       </ul>
     </div>

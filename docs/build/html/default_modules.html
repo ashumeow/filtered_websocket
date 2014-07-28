@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Default Modules &mdash; filtered_websocket 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="index.html" />
+    <link rel="next" title="Writing Modules" href="writing_modules.html" />
+    <link rel="prev" title="Welcome to filtered_websocket’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="writing_modules.html" title="Writing Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to filtered_websocket’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="default-modules">
+<h1>Default Modules<a class="headerlink" href="#default-modules" title="Permalink to this headline">¶</a></h1>
+<p>Any or all of these may be used to compose a custom server via: <tt class="docutils literal"><span class="pre">fws_server</span> <span class="pre">-f</span></tt></p>
+<dl class="class">
+<dt id="filtered_websocket.filters.broadcast_messages.BroadcastMessagesFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.broadcast_messages.</tt><tt class="descname">BroadcastMessagesFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/broadcast_messages.html#BroadcastMessagesFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.broadcast_messages.BroadcastMessagesFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Broadcasts messages to all connected clients.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.broadcast_messages_by_token.TokenMessageFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.broadcast_messages_by_token.</tt><tt class="descname">TokenMessageFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/broadcast_messages_by_token.html#TokenMessageFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.broadcast_messages_by_token.TokenMessageFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows clients to register a token group by prefixing an id with &#8220;token:&#8221;
+Once registered all messages sent by the client will only be received by
+other clients registered under the same key.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.broadcast_messages_by_token.TokenDisconnectFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.broadcast_messages_by_token.</tt><tt class="descname">TokenDisconnectFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/broadcast_messages_by_token.html#TokenDisconnectFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.broadcast_messages_by_token.TokenDisconnectFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove ids of clients no longer connected.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.broadcast_pubsub.BroadcastPubSubFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.broadcast_pubsub.</tt><tt class="descname">BroadcastPubSubFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/broadcast_pubsub.html#BroadcastPubSubFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.broadcast_pubsub.BroadcastPubSubFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will broadcast all consumed events to connected websocket clients.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.stdout_rawdata.StdoutRawDataFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.stdout_rawdata.</tt><tt class="descname">StdoutRawDataFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/stdout_rawdata.html#StdoutRawDataFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.stdout_rawdata.StdoutRawDataFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print any client data received to the server console&#8217;s stdout.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.stdout_messages.StdoutMessageFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.stdout_messages.</tt><tt class="descname">StdoutMessageFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/stdout_messages.html#StdoutMessageFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.stdout_messages.StdoutMessageFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print any client messages received to the server console&#8217;s stdout.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.stdout_pubsub.StdoutPubSubFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.stdout_pubsub.</tt><tt class="descname">StdoutPubSubFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/stdout_pubsub.html#StdoutPubSubFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.stdout_pubsub.StdoutPubSubFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print any consumed queue data to the server console&#8217;s stdout.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to filtered_websocket&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="writing_modules.html"
+                        title="next chapter">Writing Modules</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/default_modules.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="writing_modules.html" title="Writing Modules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to filtered_websocket’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Morgan Phillips.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="filtered_websocket 0.4.1 documentation" href="#" />
-    <link rel="next" title="Filter Module Overview" href="filter_modules_overview.html" /> 
+    <link rel="next" title="Default Modules" href="default_modules.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="filter_modules_overview.html" title="Filter Module Overview"
+          <a href="default_modules.html" title="Default Modules"
              accesskey="N">next</a> |</li>
         <li><a href="#">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
       </ul>
@@ -51,12 +51,49 @@
   <div class="section" id="welcome-to-filtered-websocket-s-documentation">
 <h1>Welcome to filtered_websocket&#8217;s documentation!<a class="headerlink" href="#welcome-to-filtered-websocket-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Filtered WebSocket is a straight forward module system for composing
-complex server&#8217;s without using callbacks or touching protocol classes.</p>
-<p>For instance this module broadcasts messages to all connected users when imported:</p>
+complex server behaviors without using callbacks or touching protocol classes.
+It also has redis integration for remote storage and message passing via pubsub.</p>
+<div class="section" id="install">
+<h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">filtered_websocket</span></tt> or clone the repository and run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt></p>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>After installing filtered_websocket you&#8217;ll have access to the server laucher via <tt class="docutils literal"><span class="pre">fws_server</span></tt>.
+Running <tt class="docutils literal"><span class="pre">fws_server</span> <span class="pre">-h</span></tt> will give you a list of configuration options while simply running <tt class="docutils literal"><span class="pre">fws_server</span></tt>
+will start a server running the default broadcast_messages and stdout_messages modules on port 9000.</p>
+<p>filtered_websocket is batteries included and comes with several useful modules which may be viewed on the &#8220;default modules&#8221; page.
+Modules are attached to a server via the &#8216;-f&#8217; option like so:</p>
+<div class="highlight-python"><div class="highlight"><pre># This will start a server which prints rawdata and broadcasts messages to users who have set a &quot;token&quot;
+&gt;&gt;&gt; fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-redis">
+<h2>Using Redis<a class="headerlink" href="#using-redis" title="Permalink to this headline">¶</a></h2>
+<p>Redis integration is activated by setting an environment variable <tt class="docutils literal"><span class="pre">STORAGE_OBJECT_MODULE</span></tt> to <tt class="docutils literal"><span class="pre">filtered_websocket.storage_objects.redis</span></tt>.
+When the redis storage object is activated <tt class="docutils literal"><span class="pre">fws_server</span> <span class="pre">-h</span></tt> will display new argument options for configuring your redis instance connection and channel subscriptions.</p>
+<p>Running the following would start a server which broadcasts messages received from a redis channel named global to all connected clients:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">export</span> <span class="n">STORAGE_OBJECT_MODULE</span><span class="o">=</span><span class="s">&quot;filtered_websocket.storage_objects.redis&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fws_server</span> <span class="o">-</span><span class="n">f</span> <span class="n">filtered_websocket</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">broadcast_pubsub</span>
+</pre></div>
+</div>
+<p>So, the following message, sent from another process connected to the same redis instance, would be sent to all connected clients:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">redis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Redis</span><span class="p">()</span> <span class="c"># connections to localhost on default port</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s">&quot;global&quot;</span><span class="p">,</span> <span class="s">&quot;hello from the server!&quot;</span><span class="p">)</span> <span class="c"># Connected WebSocket clients receive this message</span>
+</pre></div>
+</div>
+<p>The following would produce a server which broadcasts messages both between clients and from remote, server side, processes to clients:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">export</span> <span class="n">STORAGE_OBJECT_MODULE</span><span class="o">=</span><span class="s">&quot;filtered_websocket.storage_objects.redis&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fws_server</span> <span class="o">-</span><span class="n">f</span> <span class="n">filtered_websocket</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">broadcast_messages</span> <span class="n">filtered_websocket</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">broadcast_pubsub</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="custom-modules">
+<h2>Custom Modules<a class="headerlink" href="#custom-modules" title="Permalink to this headline">¶</a></h2>
+<p>Writing server&#8217;s with filtered_websocket is extremely terse, in fact, here is an entire broadcast/chat server:</p>
 <div class="highlight-python"><div class="highlight"><pre># saved as broadcast.py
-from filtered_websocket.filters.base import WebSocketMessageFilter
-
-
 Class Broadcast(WebSocketMessageFilter):
 @classmethod
 filter(cls, web_socket_instance, data):
@@ -65,11 +102,34 @@ filter(cls, web_socket_instance, data):
 </pre></div>
 </div>
 <p>To run the broadcast server written above simply run: <tt class="docutils literal"><span class="pre">fws_server</span> <span class="pre">-f</span> <span class="pre">broadcast</span></tt></p>
+</div>
+<div class="section" id="configuration-files">
+<h2>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h2>
+<p>Any argument from the help menu may be used to create a json formatted config file.  Simply use the long form (&#8211; prefixed) option names as keys and pass in arguments as values.  Any filters specified should be added within a list:</p>
+<div class="highlight-python"><div class="highlight"><pre># config.json
+{
+    &quot;port&quot;: &quot;9999&quot;,
+    &quot;filters&quot;: [&quot;filtered_websocket.filters.broadcast_messages_by_token&quot;, &quot;filtered_websocket.filters.stdout_messages&quot;]
+}
+
+# Passing it in creates a broadcast by token server which prints all messages to stdout
+fws_server -c config.json
+</pre></div>
+</div>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="filter_modules_overview.html">Filter Module Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="default_modules.html">Default Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_modules.html">Writing Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="writing_modules.html#introduction">Introduction</a></li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="redis_integration.html">A Closer Look At Redis Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="redis_integration.html#supported-default-modules">Supported Default Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="redis_integration.html#using-the-redis-storage-object">Using The Redis Storage Object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="redis_integration.html#writing-modules-for-redis-pubsub">Writing Modules For Redis PubSub</a></li>
+</ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -89,13 +149,20 @@ filter(cls, web_socket_instance, data):
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to filtered_websocket&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#">Welcome to filtered_websocket&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#install">Install</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#using-redis">Using Redis</a></li>
+<li><a class="reference internal" href="#custom-modules">Custom Modules</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration Files</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="filter_modules_overview.html"
-                        title="next chapter">Filter Module Overview</a></p>
+  <p class="topless"><a href="default_modules.html"
+                        title="next chapter">Default Modules</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -128,7 +195,7 @@ filter(cls, web_socket_instance, data):
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="filter_modules_overview.html" title="Filter Module Overview"
+          <a href="default_modules.html" title="Default Modules"
              >next</a> |</li>
         <li><a href="#">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
       </ul>
