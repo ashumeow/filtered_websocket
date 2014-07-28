@@ -110,7 +110,7 @@ optional arguments:
 <p>Inside your modules any data written to <tt class="docutils literal"><span class="pre">web_socket_instance.storage_object</span></tt> will go to redis.  The storage object interface is defined as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">web_socket_instance</span><span class="o">.</span><span class="n">storage_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c"># Try to grab some data from redis</span>
 <span class="n">web_socket_instance</span><span class="o">.</span><span class="n">storage_object</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="c"># Add some data to redis</span>
-<span class="n">web_socket_instance</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c"># delete something by key</span>
+<span class="n">web_socket_instance</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="c"># delete something in a fashion akin to storage_object[key].remove(value)</span>
 </pre></div>
 </div>
 </div>

@@ -11,7 +11,11 @@ It also features redis integration for remote storage and message passing via pu
 Install
 -------
 
-``pip install filtered_websocket`` or clone the repository and run ``python setup.py install``
+``pip install filtered_websocket`` 
+
+or 
+
+``git clone https://github.com/mrrrgn/filtered_websocket && cd filtered_websocket && python setup.py install``
 
 Getting Started
 ---------------

@@ -59,7 +59,7 @@ Inside your modules any data written to ``web_socket_instance.storage_object`` w
 
     web_socket_instance.storage_object.get(key) # Try to grab some data from redis
     web_socket_instance.storage_object.add(key, value) # Add some data to redis
-    web_socket_instance.remove(key) # delete something by key
+    web_socket_instance.remove(key, value) # delete something in a fashion akin to storage_object[key].remove(value)
 
 Writing Modules For Redis PubSub
 --------------------------------
