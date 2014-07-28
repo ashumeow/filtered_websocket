@@ -50,7 +50,7 @@
             
   <div class="section" id="a-closer-look-at-redis-integration">
 <h1>A Closer Look At Redis Integration<a class="headerlink" href="#a-closer-look-at-redis-integration" title="Permalink to this headline">¶</a></h1>
-<p>Along with filter modules, filtered_websocket also supports a pluggable back end storage.  To use redis as a distributed storage object and message broker simply set the environment variable &#8220;STORAGE_OBJECT_MODULE&#8221;</p>
+<p>Along with filter modules, filtered_websocket also supports pluggable back end storage via the StorageObject and PubSubStorageObject interfaces.  To use redis as a distributed storage object and message broker simply set the environment variable &#8220;STORAGE_OBJECT_MODULE&#8221;</p>
 <p><tt class="docutils literal"><span class="pre">export</span> <span class="pre">STORAGE_OBJECT_MODULE=filtered_websocket.storage_objects.redis</span></tt></p>
 <p>If you look at fws_server you&#8217;ll now notice some new options for managing your redis connection:</p>
 <div class="highlight-python"><div class="highlight"><pre>fws_server -h
@@ -80,7 +80,7 @@ optional arguments:
 </div>
 <div class="section" id="supported-default-modules">
 <h1>Supported Default Modules<a class="headerlink" href="#supported-default-modules" title="Permalink to this headline">¶</a></h1>
-<p>By default the redis storage object listens to a channel called &#8220;global&#8221; and will attach any messages passed to it to the server instances&#8217;s queue.  Messages from redis handled by the consumer filter.  As an example try to the following:</p>
+<p>By default the redis storage object listens to a channel called &#8220;global&#8221; and will attach any messages it receives to the server instances&#8217;s queue.  As such messages from redis may be handled by the consumer filter.  As an example examine the default stdout_pubsub filter module:</p>
 <div class="highlight-python"><div class="highlight"><pre>``fws_server -f filtered_websocket.filters.stdout_pubsub``
 </pre></div>
 </div>

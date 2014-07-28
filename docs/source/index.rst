@@ -31,18 +31,18 @@ Using Redis
 Redis integration is activated by setting an environment variable ``STORAGE_OBJECT_MODULE`` to ``filtered_websocket.storage_objects.redis``.
 When the redis storage object is activated ``fws_server -h`` will display new argument options for configuring your redis instance connection and channel subscriptions.
 
-Running the following would start a server which broadcasts messages received from a redis channel named global to all connected clients::
+The following would start a server which broadcasts messages received from a redis channel named global to all connected clients::
 
     >>> export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
     >>> fws_server -f filtered_websocket.filters.broadcast_pubsub
 
-So, the following message, sent from another process connected to the same redis instance, would be sent to all connected clients::
+This message, published via a redis client, connected to the same redis instance, would be sent to all connected WebSocket clients::
 
     >>> import redis
     >>> r = redis.Redis() # connections to localhost on default port
     >>> r.publish("global", "hello from the server!") # Connected WebSocket clients receive this message
 
-The following would produce a server which broadcasts messages both between clients and from remote, server side, processes to clients::
+To start a server which broadcasts messages both between clients and from remote, server side, processes to clients::
 
     >>> export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
     >>> fws_server -f filtered_websocket.filters.broadcast_messages filtered_websocket.filters.broadcast_pubsub
@@ -50,7 +50,7 @@ The following would produce a server which broadcasts messages both between clie
 Custom Modules
 ---------------
 
-Writing server's with filtered_websocket is extremely terse, in fact, here is an entire broadcast/chat server::
+Writing servers with filtered_websocket is extremely terse.  Here is an entire broadcast/chat server::
     
     # saved as broadcast.py
     Class Broadcast(WebSocketMessageFilter):

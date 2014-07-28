@@ -4,7 +4,7 @@ Writing Modules
 Introduction
 _____________
 
-In Filtered WebSocket instead of using callbacks new behaviors are added by writing modules which inherit from base filter classes.  Each base class represents an entry point into a chain of modules which will run, in the order in which they were added, whenever some event happens.
+In Filtered WebSocket, instead of using callbacks, new behaviors are added by writing modules which inherit from base WebSocketFilter types.  Each base filter class represents an entry point into a chain of modules which will run, in the order in which they were added, whenever some event happens.
 
 .. automodule:: filtered_websocket.filters.base
 
@@ -45,7 +45,7 @@ To inject the module into the server import it via the '-f' option::
 Building Pipelines via Data Mutability & Run Order
 ---------------------------------------------------
 
-Filter modules run in the order that they are imported and may be composed into pipelines.  This is possible because payload data is passed in as a bytearray which is mutable.  The filter below pops the last character off of any data sent, when combined with a default filter module which prints client messages it demonstrates that data has indeed been manipulated en route::
+Filter modules run in the order that they are imported and are passed mutable object refernces, meaning, they may be composed into pipelines.  The filter below pops the last character off of any data sent, when combined with a default filter module which prints client messages it demonstrates that data has indeed been manipulated en route::
 
     # Saved as popchar.py
     class PopChar(WebSocketMessageFilter):

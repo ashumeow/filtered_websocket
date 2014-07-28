@@ -1,7 +1,7 @@
 A Closer Look At Redis Integration
 ----------------------------------
 
-Along with filter modules, filtered_websocket also supports a pluggable back end storage.  To use redis as a distributed storage object and message broker simply set the environment variable "STORAGE_OBJECT_MODULE"
+Along with filter modules, filtered_websocket also supports pluggable back end storage via the StorageObject and PubSubStorageObject interfaces.  To use redis as a distributed storage object and message broker simply set the environment variable "STORAGE_OBJECT_MODULE"
 
 ``export STORAGE_OBJECT_MODULE=filtered_websocket.storage_objects.redis``
 
@@ -34,7 +34,7 @@ If you look at fws_server you'll now notice some new options for managing your r
 Supported Default Modules
 -------------------------
 
-By default the redis storage object listens to a channel called "global" and will attach any messages passed to it to the server instances's queue.  Messages from redis handled by the consumer filter.  As an example try to the following::
+By default the redis storage object listens to a channel called "global" and will attach any messages it receives to the server instances's queue.  As such messages from redis may be handled by the consumer filter.  As an example examine the default stdout_pubsub filter module::
 
 ``fws_server -f filtered_websocket.filters.stdout_pubsub``
 
