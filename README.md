@@ -16,7 +16,7 @@ Server event handlers are encapsulated within filters such that building elabora
 
     
 ###### Read The Docs
-http://filtered-websocket.readthedocs.org/en/latest/ (in progress...)
+http://filtered-websocket.readthedocs.org/en/latest/
 
 ###### Quickstart
 
