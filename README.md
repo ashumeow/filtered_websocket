@@ -14,13 +14,7 @@ Server event handlers are encapsulated within filters such that building elabora
 - Scales horizontally via remote backend storage (redis) and pubsub
 - Supports token based auth
 
-
-New behaviors are added by simply importing filter modules.
     
-    from filtered_websocket.filters import stdout_rawdata # Adds logging to a server
-    from filtered_websocket.filters import broadcast_messages # Broadcasts messages to all connected clients
-
-
 ###### Read The Docs
 http://filtered-websocket.readthedocs.org/en/latest/ (in progress...)
 
@@ -34,6 +28,7 @@ The server should always be started from the command line, with new behaviors sp
     
     #  start the server
     fws_server
+
     # start the server with the broadcast module explicitly
     fws_server -f filtered_websocket.filters.broadcast_messages
 
@@ -62,7 +57,6 @@ Storage objects that support pubsub, like redis, may be used for passing message
     # config.json
     {
         "port": "9000",
-        "flags": ["redis"],
         "filters": ["filtered_websocket.filters.broadcast_messages_by_token", "filtered_websocket.filters.stdout_messages"]
     }
 
