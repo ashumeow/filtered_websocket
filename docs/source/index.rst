@@ -27,7 +27,7 @@ will start a server running the default broadcast_messages and stdout_messages m
 filtered_websocket is bundled with several useful modules which may be attached to a server via the '-f' option like so::
 
     # This will start a server which prints rawdata and broadcasts messages to users who have set a "token"
-    >>> fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
+    $ fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
 
 Using Redis
 -----------
@@ -37,8 +37,8 @@ When the redis storage object is activated ``fws_server -h`` will display new ar
 
 The following would start a server which broadcasts messages received from a redis channel named global to all connected clients::
 
-    >>> export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
-    >>> fws_server -f filtered_websocket.filters.broadcast_pubsub
+    $ export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
+    $ fws_server -f filtered_websocket.filters.broadcast_pubsub
 
 This message, published via a redis client, connected to the same redis instance, would be sent to all connected WebSocket clients::
 
@@ -48,8 +48,8 @@ This message, published via a redis client, connected to the same redis instance
 
 To start a server which broadcasts messages both between clients and from remote, server side, processes to clients::
 
-    >>> export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
-    >>> fws_server -f filtered_websocket.filters.broadcast_messages filtered_websocket.filters.broadcast_pubsub
+    $ export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
+    $ fws_server -f filtered_websocket.filters.broadcast_messages filtered_websocket.filters.broadcast_pubsub
 
 Custom Modules
 ---------------
@@ -79,7 +79,7 @@ Any argument from the help menu may be used to create a json formatted config fi
     }
 
     # Passing it in creates a broadcast by token server which prints all messages to stdout
-    fws_server -c config.json
+    $ fws_server -c config.json
 
 
 Contents:

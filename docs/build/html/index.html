@@ -66,7 +66,7 @@ Running <tt class="docutils literal"><span class="pre">fws_server</span> <span c
 will start a server running the default broadcast_messages and stdout_messages modules on port 9000.</p>
 <p>filtered_websocket is bundled with several useful modules which may be attached to a server via the &#8216;-f&#8217; option like so:</p>
 <div class="highlight-python"><div class="highlight"><pre># This will start a server which prints rawdata and broadcasts messages to users who have set a &quot;token&quot;
-&gt;&gt;&gt; fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
+$ fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
 </pre></div>
 </div>
 </div>
@@ -75,8 +75,8 @@ will start a server running the default broadcast_messages and stdout_messages m
 <p>Redis integration is activated by setting an environment variable <tt class="docutils literal"><span class="pre">STORAGE_OBJECT_MODULE</span></tt> to <tt class="docutils literal"><span class="pre">filtered_websocket.storage_objects.redis</span></tt>.
 When the redis storage object is activated <tt class="docutils literal"><span class="pre">fws_server</span> <span class="pre">-h</span></tt> will display new argument options for configuring your redis instance connection and channel subscriptions.</p>
 <p>The following would start a server which broadcasts messages received from a redis channel named global to all connected clients:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">export</span> <span class="n">STORAGE_OBJECT_MODULE</span><span class="o">=</span><span class="s">&quot;filtered_websocket.storage_objects.redis&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fws_server</span> <span class="o">-</span><span class="n">f</span> <span class="n">filtered_websocket</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">broadcast_pubsub</span>
+<div class="highlight-python"><div class="highlight"><pre>$ export STORAGE_OBJECT_MODULE=&quot;filtered_websocket.storage_objects.redis&quot;
+$ fws_server -f filtered_websocket.filters.broadcast_pubsub
 </pre></div>
 </div>
 <p>This message, published via a redis client, connected to the same redis instance, would be sent to all connected WebSocket clients:</p>
@@ -86,8 +86,8 @@ When the redis storage object is activated <tt class="docutils literal"><span cl
 </pre></div>
 </div>
 <p>To start a server which broadcasts messages both between clients and from remote, server side, processes to clients:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">export</span> <span class="n">STORAGE_OBJECT_MODULE</span><span class="o">=</span><span class="s">&quot;filtered_websocket.storage_objects.redis&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fws_server</span> <span class="o">-</span><span class="n">f</span> <span class="n">filtered_websocket</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">broadcast_messages</span> <span class="n">filtered_websocket</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">broadcast_pubsub</span>
+<div class="highlight-python"><div class="highlight"><pre>$ export STORAGE_OBJECT_MODULE=&quot;filtered_websocket.storage_objects.redis&quot;
+$ fws_server -f filtered_websocket.filters.broadcast_messages filtered_websocket.filters.broadcast_pubsub
 </pre></div>
 </div>
 </div>
@@ -114,7 +114,7 @@ filter(cls, web_socket_instance, data):
 }
 
 # Passing it in creates a broadcast by token server which prints all messages to stdout
-fws_server -c config.json
+$ fws_server -c config.json
 </pre></div>
 </div>
 <p>Contents:</p>

@@ -122,10 +122,10 @@ class HiMorgan(WebSocketDataFilter):
 </pre></div>
 </div>
 <p>To inject the module into the server import it via the &#8216;-f&#8217; option:</p>
-<div class="highlight-python"><div class="highlight"><pre>fws_server -f hi_morgan
+<div class="highlight-python"><div class="highlight"><pre>$ fws_server -f hi_morgan
 
-&gt;&gt; echo &quot;Morgan&quot; | nc localhost 9000
-&gt;&gt; Hi Mrrrgn!
+$ echo &quot;Morgan&quot; | nc localhost 9000
+$ Hi Mrrrgn!
 </pre></div>
 </div>
 </div>
@@ -139,26 +139,26 @@ class PopChar(WebSocketMessageFilter):
         data.pop()  # remove last character from the bytearray
 
 # Server console
-&gt;&gt;&gt; fws_server -f popchar filtered_websocket.filters.stdout_messages
+$ fws_server -f popchar filtered_websocket.filters.stdout_messages
 
 # From a browser JS console
 &gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
 &gt;&gt;&gt; ws.send(&quot;Test&quot;);
 
 # Server console
-&gt;&gt;&gt; Tes
+$ Tes
 </pre></div>
 </div>
 <p>Now, if we reverse the order of the modules the data is printed before the character is popped:</p>
 <div class="highlight-python"><div class="highlight"><pre># Server console
-&gt;&gt;&gt; fws_server -f filtered_websocket.filters.stdout_messages popchar
+$ fws_server -f filtered_websocket.filters.stdout_messages popchar
 
 # From a browser JS console
 &gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
 &gt;&gt;&gt; ws.send(&quot;Test&quot;);
 
 # Server console
-&gt;&gt;&gt; Test
+$ Test
 </pre></div>
 </div>
 </div>

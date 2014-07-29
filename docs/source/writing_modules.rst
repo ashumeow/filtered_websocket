@@ -37,10 +37,10 @@ To write a module that responds to some sort of event just make it a subclass of
 
 To inject the module into the server import it via the '-f' option::
 
-    fws_server -f hi_morgan
+    $ fws_server -f hi_morgan
 
-    >> echo "Morgan" | nc localhost 9000
-    >> Hi Mrrrgn!
+    $ echo "Morgan" | nc localhost 9000
+    $ Hi Mrrrgn!
 
 Building Pipelines via Data Mutability & Run Order
 ---------------------------------------------------
@@ -54,26 +54,26 @@ Filter modules run in the order that they are imported and are passed mutable ob
             data.pop()  # remove last character from the bytearray
 
     # Server console
-    >>> fws_server -f popchar filtered_websocket.filters.stdout_messages
+    $ fws_server -f popchar filtered_websocket.filters.stdout_messages
 
     # From a browser JS console
     >>> var ws = new WebSocket("ws://localhost:9000");
     >>> ws.send("Test");
 
     # Server console
-    >>> Tes
+    $ Tes
 
 Now, if we reverse the order of the modules the data is printed before the character is popped::
     
     # Server console
-    >>> fws_server -f filtered_websocket.filters.stdout_messages popchar
+    $ fws_server -f filtered_websocket.filters.stdout_messages popchar
 
     # From a browser JS console
     >>> var ws = new WebSocket("ws://localhost:9000");
     >>> ws.send("Test");
 
     # Server console
-    >>> Test
+    $ Test
 
 Additional Examples
 --------------------
