@@ -7,6 +7,13 @@ Filtered WebSocket is a straight forward framework for implementing websocket se
 
 Server event handlers are encapsulated within filters such that building elaborate behaviors is as easy as importing new modules.  Imported filters automatically add themselves to an appropriate filter chain (pipeline).
 
+Pipelines aside, writing server modules is extremely terse.  This module creates a 'chat' server:
+
+    class ChatServer(WebSocketMessageFilter):
+    @classmethod
+    def filter(cls, web_socket_instance, data):
+        for client_id, client in web_socket_instnace.users.items():
+            client.sendMessage(bytes(data))
 
 *features:*
 
