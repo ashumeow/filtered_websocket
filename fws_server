@@ -28,6 +28,7 @@ if STORAGE_OBJECT_MODULE is None:
 storage_object = importlib.import_module(STORAGE_OBJECT_MODULE)
 StorageObject = storage_object.StorageObject  # NOQA
 
+# Set up the default argparser and allow it be mutated by StorageObject.parser
 parser = default_parser()
 parser = StorageObject.parser(parser)
 options = parser.parse_args(sys.argv[1:])
@@ -37,7 +38,7 @@ if options.config is not None:
     options = parser.parse_args(config_deserializer(options.config))
 
 # If no filters are specified this will be imported.
-# the broadcast_by_message filter just creates a simple broadcast server
+# the broadcast_messages filter just creates a simple broadcast server
 FILTERS = [
     "filtered_websocket.filters.broadcast_messages",
     "filtered_websocket.filters.stdout_messages",
@@ -45,11 +46,12 @@ FILTERS = [
 
 storage_object_instance = StorageObject(options)
 if issubclass(StorageObject, BasePubSubStorageObject):
+    # If we have a BasePubSubStorageObject we need to get a "Subscriber"
+    # instance from the storage object to listen for broadcasts
     storage_object_subscriber = StorageObject.get_subscriber()(
         client=storage_object_instance.get_client(),
         options=options,
     )
-    # Build our server reactor.
     web_socket_instance = build_reactor(
         options,
         storage_object=storage_object_instance,
