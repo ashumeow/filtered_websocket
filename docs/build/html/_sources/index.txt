@@ -11,7 +11,11 @@ It also features redis integration for remote storage and message passing via pu
 Install
 -------
 
-``pip install filtered_websocket`` or clone the repository and run ``python setup.py install``
+``pip install filtered_websocket`` 
+
+or 
+
+``git clone https://github.com/mrrrgn/filtered_websocket && cd filtered_websocket && python setup.py install``
 
 Getting Started
 ---------------
@@ -23,7 +27,7 @@ will start a server running the default broadcast_messages and stdout_messages m
 filtered_websocket is bundled with several useful modules which may be attached to a server via the '-f' option like so::
 
     # This will start a server which prints rawdata and broadcasts messages to users who have set a "token"
-    >>> fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
+    $ fws_server -f filtered_websocket.filters.stdout_rawdata filtered_websocket.filters.broadcast_messages_by_token
 
 Using Redis
 -----------
@@ -31,26 +35,26 @@ Using Redis
 Redis integration is activated by setting an environment variable ``STORAGE_OBJECT_MODULE`` to ``filtered_websocket.storage_objects.redis``.
 When the redis storage object is activated ``fws_server -h`` will display new argument options for configuring your redis instance connection and channel subscriptions.
 
-Running the following would start a server which broadcasts messages received from a redis channel named global to all connected clients::
+The following would start a server which broadcasts messages received from a redis channel named global to all connected clients::
 
-    >>> export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
-    >>> fws_server -f filtered_websocket.filters.broadcast_pubsub
+    $ export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
+    $ fws_server -f filtered_websocket.filters.broadcast_pubsub
 
-So, the following message, sent from another process connected to the same redis instance, would be sent to all connected clients::
+This message, published via a redis client, connected to the same redis instance, would be sent to all connected WebSocket clients::
 
     >>> import redis
     >>> r = redis.Redis() # connections to localhost on default port
     >>> r.publish("global", "hello from the server!") # Connected WebSocket clients receive this message
 
-The following would produce a server which broadcasts messages both between clients and from remote, server side, processes to clients::
+To start a server which broadcasts messages both between clients and from remote, server side, processes to clients::
 
-    >>> export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
-    >>> fws_server -f filtered_websocket.filters.broadcast_messages filtered_websocket.filters.broadcast_pubsub
+    $ export STORAGE_OBJECT_MODULE="filtered_websocket.storage_objects.redis"
+    $ fws_server -f filtered_websocket.filters.broadcast_messages filtered_websocket.filters.broadcast_pubsub
 
 Custom Modules
 ---------------
 
-Writing server's with filtered_websocket is extremely terse, in fact, here is an entire broadcast/chat server::
+Writing servers with filtered_websocket is extremely terse.  Here is an entire broadcast/chat server::
     
     # saved as broadcast.py
     Class Broadcast(WebSocketMessageFilter):
@@ -75,7 +79,7 @@ Any argument from the help menu may be used to create a json formatted config fi
     }
 
     # Passing it in creates a broadcast by token server which prints all messages to stdout
-    fws_server -c config.json
+    $ fws_server -c config.json
 
 
 Contents:

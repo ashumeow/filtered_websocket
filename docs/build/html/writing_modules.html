@@ -56,7 +56,7 @@
 <h1>Writing Modules<a class="headerlink" href="#writing-modules" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>In Filtered WebSocket instead of using callbacks new behaviors are added by writing modules which inherit from base filter classes.  Each base class represents an entry point into a chain of modules which will run, in the order in which they were added, whenever some event happens.</p>
+<p>In Filtered WebSocket, instead of using callbacks, new behaviors are added by writing modules which inherit from base WebSocketFilter types.  Each base filter class represents an entry point into a chain of modules which will run, in the order in which they were added, whenever some event happens.</p>
 <span class="target" id="module-filtered_websocket.filters.base"></span><p>FilterBase and FilterMeta allow for the simple creation of a filter chains.
 Any class that inherits from a child of FilterBase and FilterMeta
 will have its filter method called upon run being executed from its parent class.
@@ -122,16 +122,16 @@ class HiMorgan(WebSocketDataFilter):
 </pre></div>
 </div>
 <p>To inject the module into the server import it via the &#8216;-f&#8217; option:</p>
-<div class="highlight-python"><div class="highlight"><pre>fws_server -f hi_morgan
+<div class="highlight-python"><div class="highlight"><pre>$ fws_server -f hi_morgan
 
-&gt;&gt; echo &quot;Morgan&quot; | nc localhost 9000
-&gt;&gt; Hi Mrrrgn!
+$ echo &quot;Morgan&quot; | nc localhost 9000
+$ Hi Mrrrgn!
 </pre></div>
 </div>
 </div>
 <div class="section" id="building-pipelines-via-data-mutability-run-order">
 <h3>Building Pipelines via Data Mutability &amp; Run Order<a class="headerlink" href="#building-pipelines-via-data-mutability-run-order" title="Permalink to this headline">¶</a></h3>
-<p>Filter modules run in the order that they are imported and may be composed into pipelines.  This is possible because payload data is passed in as a bytearray which is mutable.  The filter below pops the last character off of any data sent, when combined with a default filter module which prints client messages it demonstrates that data has indeed been manipulated en route:</p>
+<p>Filter modules run in the order that they are imported and are passed mutable object refernces, meaning, they may be composed into pipelines.  The filter below pops the last character off of any data sent, when combined with a default filter module which prints client messages it demonstrates that data has indeed been manipulated en route:</p>
 <div class="highlight-python"><div class="highlight"><pre># Saved as popchar.py
 class PopChar(WebSocketMessageFilter):
     @classmethod
@@ -139,26 +139,26 @@ class PopChar(WebSocketMessageFilter):
         data.pop()  # remove last character from the bytearray
 
 # Server console
-&gt;&gt;&gt; fws_server -f popchar filtered_websocket.filters.stdout_messages
+$ fws_server -f popchar filtered_websocket.filters.stdout_messages
 
 # From a browser JS console
 &gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
 &gt;&gt;&gt; ws.send(&quot;Test&quot;);
 
 # Server console
-&gt;&gt;&gt; Tes
+$ Tes
 </pre></div>
 </div>
 <p>Now, if we reverse the order of the modules the data is printed before the character is popped:</p>
 <div class="highlight-python"><div class="highlight"><pre># Server console
-&gt;&gt;&gt; fws_server -f filtered_websocket.filters.stdout_messages popchar
+$ fws_server -f filtered_websocket.filters.stdout_messages popchar
 
 # From a browser JS console
 &gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
 &gt;&gt;&gt; ws.send(&quot;Test&quot;);
 
 # Server console
-&gt;&gt;&gt; Test
+$ Test
 </pre></div>
 </div>
 </div>
