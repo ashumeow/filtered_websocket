@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>A Closer Look At Redis Integration &mdash; filtered_websocket 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="index.html" />
+    <link rel="prev" title="Writing Modules" href="writing_modules.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="writing_modules.html" title="Writing Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="a-closer-look-at-redis-integration">
+<h1>A Closer Look At Redis Integration<a class="headerlink" href="#a-closer-look-at-redis-integration" title="Permalink to this headline">¶</a></h1>
+<p>Along with filter modules, filtered_websocket also supports pluggable back end storage via the StorageObject and PubSubStorageObject interfaces.  To use redis as a distributed storage object and message broker simply set the environment variable &#8220;STORAGE_OBJECT_MODULE&#8221;</p>
+<p><tt class="docutils literal"><span class="pre">export</span> <span class="pre">STORAGE_OBJECT_MODULE=filtered_websocket.storage_objects.redis</span></tt></p>
+<p>If you look at fws_server you&#8217;ll now notice some new options for managing your redis connection:</p>
+<div class="highlight-python"><div class="highlight"><pre>fws_server -h
+usage: fws_server [-h] [-p PORT] [-c CONFIG] [-f [FILTERS [FILTERS ...]]]
+                  [-key KEY] [-cert CERT] [--redis_host REDIS_HOST]
+                  [--redis_port REDIS_PORT]
+                  [--redis_channels [REDIS_CHANNELS [REDIS_CHANNELS ...]]]
+                  [--redis_key REDIS_KEY]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PORT, --port PORT  The listening port.
+  -c CONFIG, --config CONFIG
+                        A JSON config file.
+  -f [FILTERS [FILTERS ...]], --filters [FILTERS [FILTERS ...]]
+                        Filters to import at runtime.
+  -key KEY              A key file (ssl).
+  -cert CERT            A certificate file (ssl).
+  --redis_host REDIS_HOST
+  --redis_port REDIS_PORT
+  --redis_channels [REDIS_CHANNELS [REDIS_CHANNELS ...]]
+                        pubsub channels to subscribe to.
+  --redis_key REDIS_KEY
+                        A key prefix.
+</pre></div>
+</div>
+</div>
+<div class="section" id="supported-default-modules">
+<h1>Supported Default Modules<a class="headerlink" href="#supported-default-modules" title="Permalink to this headline">¶</a></h1>
+<p>By default the redis storage object listens to a channel called &#8220;global&#8221; and will attach any messages it receives to the server instances&#8217;s queue.  As such messages from redis may be handled by the consumer filter.  As an example examine the default stdout_pubsub filter module:</p>
+<div class="highlight-python"><div class="highlight"><pre>``fws_server -f filtered_websocket.filters.stdout_pubsub``
+</pre></div>
+</div>
+<dl class="class">
+<dt id="filtered_websocket.filters.stdout_pubsub.StdoutPubSubFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.stdout_pubsub.</tt><tt class="descname">StdoutPubSubFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/stdout_pubsub.html#StdoutPubSubFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.stdout_pubsub.StdoutPubSubFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print any consumed queue data to the server console&#8217;s stdout.</p>
+</dd></dl>
+
+<p>Importing the stdout_pubsub filter will print all redis messages captured by the server to your console:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">redis</span>
+<span class="n">redis_client</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Redis</span><span class="p">()</span>
+<span class="n">redis_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s">&quot;global&quot;</span><span class="p">,</span> <span class="s">&quot;hello from the server!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To send redis messages to connected clients use the <tt class="docutils literal"><span class="pre">broadcast_pubsub</span></tt> filter:</p>
+<p><tt class="docutils literal"><span class="pre">fws_sever</span> <span class="pre">-f</span> <span class="pre">filtered_websocket.filters.broadcast_pubsub</span></tt></p>
+<dl class="class">
+<dt id="filtered_websocket.filters.broadcast_pubsub.BroadcastPubSubFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.broadcast_pubsub.</tt><tt class="descname">BroadcastPubSubFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/broadcast_pubsub.html#BroadcastPubSubFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.broadcast_pubsub.BroadcastPubSubFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will broadcast all consumed events to connected websocket clients.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="using-the-redis-storage-object">
+<h1>Using The Redis Storage Object<a class="headerlink" href="#using-the-redis-storage-object" title="Permalink to this headline">¶</a></h1>
+<p>Inside your modules any data written to <tt class="docutils literal"><span class="pre">web_socket_instance.storage_object</span></tt> will go to redis.  The storage object interface is defined as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">web_socket_instance</span><span class="o">.</span><span class="n">storage_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c"># Try to grab some data from redis</span>
+<span class="n">web_socket_instance</span><span class="o">.</span><span class="n">storage_object</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="c"># Add some data to redis</span>
+<span class="n">web_socket_instance</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="c"># delete something in a fashion akin to storage_object[key].remove(value)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="writing-modules-for-redis-pubsub">
+<h1>Writing Modules For Redis PubSub<a class="headerlink" href="#writing-modules-for-redis-pubsub" title="Permalink to this headline">¶</a></h1>
+<p>All data received from pubsub subscriptions will be attached to the server&#8217;s queue and later consumed.  So, modules
+which wish to interact with these events should inherit from:</p>
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketConsumerFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketConsumerFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketConsumerFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketConsumerFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs whenever data is popped off of a web socket server instance&#8217;s queue.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">A Closer Look At Redis Integration</a></li>
+<li><a class="reference internal" href="#supported-default-modules">Supported Default Modules</a></li>
+<li><a class="reference internal" href="#using-the-redis-storage-object">Using The Redis Storage Object</a></li>
+<li><a class="reference internal" href="#writing-modules-for-redis-pubsub">Writing Modules For Redis PubSub</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="writing_modules.html"
+                        title="previous chapter">Writing Modules</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/redis_integration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="writing_modules.html" title="Writing Modules"
+             >previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Morgan Phillips.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

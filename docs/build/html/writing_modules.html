@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing Modules &mdash; filtered_websocket 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="filtered_websocket 0.4.1 documentation" href="index.html" />
+    <link rel="next" title="A Closer Look At Redis Integration" href="redis_integration.html" />
+    <link rel="prev" title="Default Modules" href="default_modules.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="redis_integration.html" title="A Closer Look At Redis Integration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="default_modules.html" title="Default Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-modules">
+<h1>Writing Modules<a class="headerlink" href="#writing-modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>In Filtered WebSocket, instead of using callbacks, new behaviors are added by writing modules which inherit from base WebSocketFilter types.  Each base filter class represents an entry point into a chain of modules which will run, in the order in which they were added, whenever some event happens.</p>
+<span class="target" id="module-filtered_websocket.filters.base"></span><p>FilterBase and FilterMeta allow for the simple creation of a filter chains.
+Any class that inherits from a child of FilterBase and FilterMeta
+will have its filter method called upon run being executed from its parent class.
+Here class A constructs a new filter chain, which B and C become members of.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">FilterBase</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">FilterMeta</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="k">pass</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nd">@classmethod</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">web_socket_instance</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>       <span class="k">print</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nd">@classmethod</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">web_socket_instance</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="k">print</span><span class="p">(</span><span class="s">&quot;bar&quot;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">web_socket_instance</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="go">foo</span>
+<span class="go">bar</span>
+</pre></div>
+</div>
+<p>Each filter has access to a server instance with a dictionary of user ids mapped to user objects, a storage object, and an optional token object for storing credentials.  It also receives payload data in the form of a bytearray().</p>
+<div class="section" id="filter-module-types">
+<h3>Filter Module Types<a class="headerlink" href="#filter-module-types" title="Permalink to this headline">¶</a></h3>
+<p>There are four filter chains, each corresponding to a callback.</p>
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketDataFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketDataFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketDataFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketDataFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs whenever a web socket server instance receives any data from a client.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketMessageFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketMessageFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketMessageFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketMessageFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs whenever a web socket server instance receives a full data frame.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketDisconnectFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketDisconnectFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketDisconnectFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketDisconnectFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs whenever a user disconnects from a web socket server instance
+(passes in no data).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="filtered_websocket.filters.base.WebSocketConsumerFilter">
+<em class="property">class </em><tt class="descclassname">filtered_websocket.filters.base.</tt><tt class="descname">WebSocketConsumerFilter</tt><a class="reference internal" href="_modules/filtered_websocket/filters/base.html#WebSocketConsumerFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#filtered_websocket.filters.base.WebSocketConsumerFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs whenever data is popped off of a web socket server instance&#8217;s queue.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="example-module">
+<h3>Example Module<a class="headerlink" href="#example-module" title="Permalink to this headline">¶</a></h3>
+<p>To write a module that responds to some sort of event just make it a subclass of the corresponding parent and override &#8220;filter&#8221; as either a classmethod or a static method.  Let&#8217;s write a rawdata module that responds to my name:</p>
+<div class="highlight-python"><div class="highlight"><pre># Saved as hi_morgan.py
+class HiMorgan(WebSocketDataFilter):
+    @classmethod
+    filter(cls, web_socket_instance, data):
+        payload = bytes(data)
+        if payload.lower().strip() == b&#39;morgan&#39;:
+            print(&#39;Hi Mrrrgn!&#39;)
+</pre></div>
+</div>
+<p>To inject the module into the server import it via the &#8216;-f&#8217; option:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ fws_server -f hi_morgan
+
+$ echo &quot;Morgan&quot; | nc localhost 9000
+$ Hi Mrrrgn!
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-pipelines-via-data-mutability-run-order">
+<h3>Building Pipelines via Data Mutability &amp; Run Order<a class="headerlink" href="#building-pipelines-via-data-mutability-run-order" title="Permalink to this headline">¶</a></h3>
+<p>Filter modules run in the order that they are imported and are passed mutable object refernces, meaning, they may be composed into pipelines.  The filter below pops the last character off of any data sent, when combined with a default filter module which prints client messages it demonstrates that data has indeed been manipulated en route:</p>
+<div class="highlight-python"><div class="highlight"><pre># Saved as popchar.py
+class PopChar(WebSocketMessageFilter):
+    @classmethod
+    filter(cls, web_socket_instance, data):
+        data.pop()  # remove last character from the bytearray
+
+# Server console
+$ fws_server -f popchar filtered_websocket.filters.stdout_messages
+
+# From a browser JS console
+&gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
+&gt;&gt;&gt; ws.send(&quot;Test&quot;);
+
+# Server console
+$ Tes
+</pre></div>
+</div>
+<p>Now, if we reverse the order of the modules the data is printed before the character is popped:</p>
+<div class="highlight-python"><div class="highlight"><pre># Server console
+$ fws_server -f filtered_websocket.filters.stdout_messages popchar
+
+# From a browser JS console
+&gt;&gt;&gt; var ws = new WebSocket(&quot;ws://localhost:9000&quot;);
+&gt;&gt;&gt; ws.send(&quot;Test&quot;);
+
+# Server console
+$ Test
+</pre></div>
+</div>
+</div>
+<div class="section" id="additional-examples">
+<h3>Additional Examples<a class="headerlink" href="#additional-examples" title="Permalink to this headline">¶</a></h3>
+<p>For additional module examples please see the default modules.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Writing Modules</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#filter-module-types">Filter Module Types</a></li>
+<li><a class="reference internal" href="#example-module">Example Module</a></li>
+<li><a class="reference internal" href="#building-pipelines-via-data-mutability-run-order">Building Pipelines via Data Mutability &amp; Run Order</a></li>
+<li><a class="reference internal" href="#additional-examples">Additional Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="default_modules.html"
+                        title="previous chapter">Default Modules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="redis_integration.html"
+                        title="next chapter">A Closer Look At Redis Integration</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/writing_modules.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="redis_integration.html" title="A Closer Look At Redis Integration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="default_modules.html" title="Default Modules"
+             >previous</a> |</li>
+        <li><a href="index.html">filtered_websocket 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Morgan Phillips.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,5 +1,0 @@
-{
-    "port": "7766",
-    "flags": ["redis"],
-    "filters": ["filters.broadcast_messages", "filters.stdout_rawdata"]
-}

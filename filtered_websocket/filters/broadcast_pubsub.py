@@ -1,9 +1,11 @@
-from base import WebSocketConsumerFilter
+from __future__ import absolute_import
+
+from .base import WebSocketConsumerFilter
 
 
-class BroadcastMessageFilter(WebSocketConsumerFilter):
+class BroadcastPubSubFilter(WebSocketConsumerFilter):
     """
-    Will broadcast all pubsub events to connected websocket clients.
+    Will broadcast all consumed events to connected websocket clients.
     """
 
     @classmethod

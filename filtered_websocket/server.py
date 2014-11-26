@@ -7,17 +7,22 @@ Create WebSocket servers by composing filter chains.
 
 """
 
+from __future__ import absolute_import
+
 from twisted.internet.protocol import Factory
-from twisted.internet import reactor
+from twisted.internet import reactor, ssl
 from twisted.internet.task import LoopingCall
-from TwistedWebsocket.server import Protocol
+from .server_protocol.server import Protocol
+import collections
 import argparse
-import json
-import ssl
 import sys
 
-from storage_objects.default_storage_object import DefaultStorageObject
-from filters.base import (
+if sys.version_info >= (3, 0, 0):
+    from queue import Queue
+else:
+    from Queue import Queue
+
+from .filters.base import (
     WebSocketDataFilter,
     WebSocketMessageFilter,
     WebSocketDisconnectFilter,
@@ -26,6 +31,10 @@ from filters.base import (
 
 
 class FilteredWebSocket(Protocol):
+    """
+    A twisted protocol defining our websocket server, with filter chains being
+    called within all of it's callbacks.
+    """
 
     def __init__(self, *args, **kwargs):
 
@@ -39,8 +48,7 @@ class FilteredWebSocket(Protocol):
         self.token = kwargs.pop("token")
 
         # A queue to be used in any producer/consumer activities
-        # TODO: Implement this as an actual Queue object
-        self.queue = []
+        self.queue = Queue()
 
         super(FilteredWebSocket, self).__init__(*args, **kwargs)
 
@@ -56,12 +64,21 @@ class FilteredWebSocket(Protocol):
 
 
 class FilteredWebSocketFactory(Factory):
+    """
+    A twisted factory which initializes our server's
+    internal data structures (token, users, and queue).
+    It also defines a method which will be used to consume
+    queue data.
+    """
 
     def __init__(self, **kwargs):
-        self.storage_object = kwargs.get("storage_object", DefaultStorageObject())
+        self.storage_object = kwargs.get(
+            "storage_object",
+            collections.defaultdict(set)
+        )
         self.token = kwargs.get("token")
         self.users = {}
-        self.queue = []
+        self.queue = Queue()
 
     def buildProtocol(self, _address):
         return FilteredWebSocket(
@@ -69,6 +86,50 @@ class FilteredWebSocketFactory(Factory):
             storage_object=self.storage_object,
             token=self.token
         )
+
+    def consumer(self):
+        """
+        Called in a reactor loop to enable the producer/consumer pattern.
+        """
+        if not self.queue.empty():
+            data = self.queue.get()
+            WebSocketConsumerFilter.run(self, data)
+
+
+def build_reactor(options, **kwargs):
+    """
+    Uses context to attach features to the twisted reactor.
+    """
+    web_socket_instance = FilteredWebSocketFactory(**kwargs)
+    subscriber = kwargs.pop("subscriber", None)
+
+    if options.key and options.cert:
+        with open(options.key) as keyFile:
+            with open(options.cert) as certFile:
+                cert = ssl.PrivateCertificate.loadPEM(keyFile.read() + certFile.read())
+                reactor.listenSSL(options.port, web_socket_instance, cert.options())
+    else:
+        reactor.listenTCP(
+            options.port,
+            web_socket_instance
+        )
+    if subscriber is not None:
+        reactor.callInThread(
+            subscriber.listener,
+            web_socket_instance
+        )
+        reactor.addSystemEventTrigger(
+            "before",
+            "shutdown",
+            subscriber.kill
+        )
+
+    # Start the consumer loop
+    consumer_loop = LoopingCall(
+        web_socket_instance.consumer
+    )
+    consumer_loop.start(0.001, now=False)
+    return web_socket_instance
 
 
 def default_parser():
@@ -99,130 +160,4 @@ def default_parser():
         "-cert",
         help="A certificate file (ssl)."
     )
-    parser.add_argument(
-        "-token",
-        help="Set a default token value."
-    )
     return parser
-
-
-def consumer(web_socket_instance):
-    """
-    Called in a reactor loop to enable the producer/consumer pattern.
-    """
-    queue = web_socket_instance.queue
-    if len(queue) > 0:
-        data = queue.pop()
-        WebSocketConsumerFilter.run(web_socket_instance, data)
-
-
-def build_reactor(options, **kwargs):
-    web_socket_instance = FilteredWebSocketFactory(**kwargs)
-    pubsub_listener = kwargs.pop("pubsub_listener", None)
-
-    if options.key and options.cert:
-        with open(options.key) as keyFile:
-            with open(options.cert) as certFile:
-                cert = ssl.PrivateCertificate.loadPEM(keyFile.read() + certFile.read())
-                reactor.listenSSL(options.port, web_socket_instance, cert.options())
-    else:
-        reactor.listenTCP(
-            options.port,
-            web_socket_instance
-        )
-    if pubsub_listener is not None:
-        reactor.callInThread(
-            pubsub_listener.listener,
-            web_socket_instance
-        )
-        reactor.addSystemEventTrigger(
-            "before",
-            "shutdown",
-            pubsub_listener.kill
-        )
-
-    # Start the consumer loop
-    consumer_loop = LoopingCall(
-        consumer,
-        web_socket_instance
-    )
-    consumer_loop.start(0.01, now=False)
-    return web_socket_instance
-
-
-def config_deserializer(filename):
-    """
-    Transforms a JSON config file into a list or arguments which may be passed
-    to arg_parser.parse_args.
-
-    For instance:
-
-        {
-            port: 22
-        }
-
-    Would would be transformed to:
-
-        ['--port', '22']
-    """
-    with open(filename, "r") as config_file:
-        config_lines = "".join([l for l in config_file if l[0] != "#"])
-        config_data = json.loads(config_lines)
-        processed_config_data = []
-        for key, value in config_data.items():
-            if key == "flags":
-                for flag in value:
-                    processed_config_data.append("--%s" % flag)
-            else:
-                processed_config_data.append("--%s" % key)
-                if isinstance(value, (list, set)):
-                    processed_config_data += value
-                else:
-                    processed_config_data.append(value)
-    return processed_config_data
-
-
-if __name__ == '__main__':
-    import importlib
-    from storage_objects.redis_storage_object import RedisStorageObject, redis_parser
-    from pubsub_listeners.redis_pubsub_listener import RedisPubSubListener
-
-    parser = default_parser()
-    parser = redis_parser(parser)
-    options = parser.parse_args(sys.argv[1:])
-
-    # A passed in config file will overwrite all other args
-    if options.config is not None:
-        options = parser.parse_args(config_deserializer(options.config))
-
-    # If no filters are specified this will be imported.
-    # the broadcast_by_message filter just creates a simple broadcast server
-    FILTERS = ["filters.broadcast_messages_by_token", "filters.stdout_messages"]
-    if options.filters is not None:
-        FILTERS = options.filters
-
-    # Importing the filters will inject them into event handlers at runtime
-    for _filter in FILTERS:
-        importlib.import_module(_filter)
-
-    # Extra args to set up custom storage (redis in this case)
-    extra = {}
-    if options.redis is True:
-            redis_storage_object = RedisStorageObject(
-                host=options.redis_host,
-                port=options.redis_port,
-                key=options.redis_key
-            )
-            redis_pubsub = RedisPubSubListener(
-                redis_storage_object.redis,
-                options.redis_channels
-            )
-            # Build our server reactor.
-            web_socket_instance = build_reactor(
-                options,
-                storage_object=redis_storage_object,
-                pubsub_listener=redis_pubsub
-            )
-    else:
-        build_reactor(options)
-    reactor.run()

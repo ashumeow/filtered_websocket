@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from filtered_websocket.server import config_deserializer
+from filtered_websocket.config_deserializer import config_deserializer
 
 
 class ConfigDeserializerTestCase(unittest.TestCase):
@@ -15,19 +15,19 @@ class ConfigDeserializerTestCase(unittest.TestCase):
 
     def test_deserialize(self):
         deserialized_config = config_deserializer(self.config_file)
-        self.assertItemsEqual(
-            deserialized_config,
-            [
-                "--port",
-                "2718",
-                "--flag_one",
-                "--flag_two",
-                "--filters",
-                "a",
-                "b",
-                "c",
-            ]
-        )
+        expected_ops = [
+            "--port",
+            "2718",
+            "--flag_one",
+            "--flag_two",
+            "--filters",
+            "a",
+            "b",
+            "c",
+        ]
+
+        for opt in expected_ops:
+            self.assertIn(opt, deserialized_config)
 
 if __name__ == '__main__':
     unittest.main()
